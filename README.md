@@ -10,6 +10,10 @@ The following features is implemented:
 
 The interface runs in docker and requires the host to have installed wireguard, either as a dkms module, or by using newer kernels (5.6+)
 
+# Dependencies
+* wireguard-dkms or Linux kernel >= 5.6
+* docker
+
 # Installation
 ```bash
 docker build -t perara/wireguard-manager https://github.com/perara/wireguard-manager.git \
