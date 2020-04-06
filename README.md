@@ -25,13 +25,13 @@ When docker container is started, go to http://localhost:80
 
 
 # Showcase
-![Illustration][docs/images/1.png]
+![Illustration](docs/images/1.png)
 
-![Illustration][docs/images/2.png]
+![Illustration](docs/images/2.png)
 
-![Illustration][docs/images/3.png]
+![Illustration](docs/images/3.png)
 
-![Illustration][docs/images/4.png]
+![Illustration](docs/images/4.png)
 
 # Roadmap
 * Add some insecure authentication
