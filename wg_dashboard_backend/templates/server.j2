@@ -1,0 +1,17 @@
+[Interface]
+Address = {{ data.address }}
+ListenPort = {{ data.listen_port }}
+PrivateKey = {{ data.private_key }}
+
+PostUp = {{ data.post_up }}
+PostDown = {{ data.post_down }}
+
+{% for peer in data.peers %}
+[Peer]
+# Client Name: {{ peer.name }}
+PublicKey = {{ peer.public_key }}
+{%- if peer.preshared_key -%}
+PresharedKey = {{ peer.preshared_key }}
+{% endif %}
+AllowedIPs = {{ peer.address }}
+{% endfor %}

@@ -1,0 +1,36 @@
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">{{title || "No 'title' defined" }}</h4>
+
+
+    <button type="button" class="close" aria-label="Close" (click)="modal.close('cancel')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+
+  </div>
+  <div class="modal-body">
+      <textarea *ngIf="area" readonly class="
+                  mdl-textfield--full-width
+                  mdl-layout__header" style="min-height: 250px; height: 100%;">{{text || "No Text Defined" }}</textarea>
+      <div class="form-group" *ngIf="!area">{{text || "No Text Defined" }}</div>
+    <div style="text-align: center;" *ngIf="qrCode">
+      <qrcode [qrdata]="text" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
+    </div>
+
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-dark" (click)="modal.close('confirm')">Confirm</button>
+    <button type="button" class="btn btn-dark" (click)="modal.close('cancel')">Cancel</button>
+  </div>
+</ng-template>
+
+
+
+<button
+  class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect"
+  data-placement="bottom"
+  [title]="hover"
+  (click)="open($event, content)">
+  <i class="material-icons">{{icon}}</i>
+</button>

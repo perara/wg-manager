@@ -1,0 +1,96 @@
+
+
+  <base-card>
+    <base-card-title>
+      <h2 class="mdl-card__title-text">Add Server</h2>
+    </base-card-title>
+    <base-card-body>
+
+      <form [formGroup]="serverForm" (ngSubmit)="serverForm.valid && add(serverForm.value)" class="form">
+
+        <p style="margin-bottom: 10px;">Essentials</p>
+        <div class="mdl-grid">
+          <div class="mdl-cell mdl-cell--6-col mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input formControlName="interface" class="mdl-textfield__input" type="text" id="interface" placeholder="wg0" value=""/>
+            <label class="mdl-textfield__label" for="interface">Interface</label>
+          </div>
+
+          <div class="mdl-cell mdl-cell--6-col mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input formControlName="address" class="mdl-textfield__input" type="text" id="address" placeholder="10.0.200.1/24" value="10.0.200.1/24"/>
+            <label class="mdl-textfield__label" for="address">Address</label>
+          </div>
+
+          <div class="mdl-cell mdl-cell--6-col mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input formControlName="endpoint" class="mdl-textfield__input" type="text" id="endpoint" placeholder="my-address.com" value=""/>
+            <label class="mdl-textfield__label" for="endpoint">Endpoint</label>
+          </div>
+
+          <div class="mdl-cell mdl-cell--6-col mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input formControlName="listen_port" class="mdl-textfield__input" type="text" id="listen_port" placeholder="51820" value="51820"/>
+            <label class="mdl-textfield__label" for="listen_port">Listen-Port</label>
+          </div>
+
+        </div>
+
+        <p style="margin-bottom: 10px;">Keys</p>
+
+        <div class="mdl-grid">
+
+          <div class="mdl-cell mdl-cell--12-col mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input formControlName="private_key" class="mdl-textfield__input" type="text" id="private_key" placeholder="" value=""/>
+            <label class="mdl-textfield__label" for="private_key">Private-Key</label>
+          </div>
+
+          <div class="mdl-cell mdl-cell--12-col mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input formControlName="public_key" class="mdl-textfield__input" type="text" id="public_key" placeholder="" value=""/>
+            <label class="mdl-textfield__label" for="public_key">Public-Key</label>
+          </div>
+
+          <div class="mdl-cell mdl-cell--12-col mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input formControlName="shared_key" class="mdl-textfield__input" type="text" id="shared_key" placeholder="" value=""/>
+            <label class="mdl-textfield__label" for="shared_key">Shared-Key</label>
+          </div>
+
+          <button type="button" [hidden]="!isEdit" (click)="getKeyPair()" class="mdl-button mdl-js-button mdl-button--primary">
+            <i class="material-icons">vpn_key</i>
+            Generate KeyPair
+          </button>
+
+          <button type="button" [hidden]="!isEdit" (click)="getPSK()" class="mdl-button mdl-js-button mdl-button--primary">
+            <i class="material-icons">share</i>
+            Generate PSK
+          </button>
+
+        </div>
+        <p style="margin-bottom: 20px;">Scripts</p>
+
+        <div class="mdl-grid ">
+
+          <div class="mdl-cell mdl-cell--12-col mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input formControlName="post_up" class="mdl-textfield__input" type="text" id="post_up" placeholder="" value=""/>
+            <label class="mdl-textfield__label" for="post_up">Post-Up</label>
+          </div>
+
+          <div class="mdl-cell mdl-cell--12-col mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input formControlName="post_down" class="mdl-textfield__input" type="text" id="post_down" placeholder="" value=""/>
+            <label class="mdl-textfield__label" for="post_down">Post-Down</label>
+          </div>
+
+        </div>
+
+
+        <button [disabled]="!serverForm.valid" type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue">
+          <ng-container *ngIf="!isEdit">Add Server</ng-container>
+          <ng-container *ngIf="isEdit">Edit Server</ng-container>
+        </button>
+
+        <button (click)="isEdit = false; serverForm.reset()" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue">
+          Reset
+        </button>
+
+      </form>
+
+
+    </base-card-body>
+  </base-card>
+

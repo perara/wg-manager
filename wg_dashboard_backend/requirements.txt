@@ -1,0 +1,11 @@
+pydantic
+fastapi
+aiofiles
+aiosqlite
+sqlalchemy
+databases
+PyJWT
+passlib
+bcrypt
+python-multipart
+jinja2

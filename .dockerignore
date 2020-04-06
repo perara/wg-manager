@@ -1,0 +1,9 @@
+
+**/config
+**/build
+**/database.db
+**/node_modules
+**/.github
+**/dist
+
+

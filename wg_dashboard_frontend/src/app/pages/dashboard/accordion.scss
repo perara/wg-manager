@@ -1,0 +1,34 @@
+.mdl-accordion.mdl-accordion--opened {
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+  margin-top: -1px;
+}
+.mdl-accordion.mdl-accordion--opened + .mdl-accordion.mdl-accordion--opened {
+  border-top: none;
+  margin-top: 0
+}
+.mdl-accordion .mdl-accordion__content-wrapper {
+  overflow: hidden;
+}
+.mdl-accordion .mdl-accordion__content {
+  transition-property: margin-top;
+  transition-duration: 0.2s;
+}
+.mdl-accordion .mdl-accordion__icon {
+  transition-property: transform;
+  transition-duration: 0.2s;
+  color: rgba(0,0,0,0.3);
+
+  position: absolute;
+  right: 6px;
+  margin-top: -3px;
+}
+.mdl-accordion.mdl-accordion--opened .mdl-accordion__icon {
+  transform: rotate(-180deg);
+}
+.mdl-accordion.mdl-accordion--opened .mdl-accordion__button {
+  color: teal;
+}
+.mdl-accordion.mdl-accordion--opened .mdl-accordion__content {
+  margin-top: 0 !important;
+}

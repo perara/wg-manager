@@ -1,0 +1,29 @@
+
+<div class="mdl-grid mdl-cell mdl-cell--8-col-desktop mdl-cell--8-col-tablet mdl-cell--12-col-phone mdl-cell--top">
+
+
+
+  <!-- No Servers -->
+  <div *ngIf="servers.length == 0" class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet">
+    <base-card>
+      <base-card-title>
+        <h2 class="mdl-card__title-text">Servers</h2>
+      </base-card-title>
+      <base-card-body>
+        <p>No Servers</p>
+      </base-card-body>
+    </base-card>
+  </div>
+
+  <!-- Servers For Loop -->
+  <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet" *ngFor="let server of servers; let idx = index">
+    <app-server [(server)]="servers[idx]" [(servers)]="servers"></app-server>
+  </div>
+
+
+</div>
+
+
+<div class="mdl-grid mdl-cell mdl-cell--4-col-desktop mdl-cell--4-col-tablet mdl-cell--12-col-phone mdl-cell--top" style="margin-top: 16px;">
+  <app-add-server [(servers)]="servers"></app-add-server>
+</div>
