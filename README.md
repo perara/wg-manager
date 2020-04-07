@@ -16,12 +16,7 @@ The interface runs in docker and requires the host to have installed wireguard, 
 
 # Installation
 ```bash
-docker build -t perara/wireguard-manager https://github.com/perara/wireguard-manager.git \
-&& docker run
--v ./config:/config
---cap-add NET_ADMIN
---net host
-perara/wireguard-manager 
+docker run -v ./config:/config --cap-add NET_ADMIN --net host perara/wireguard-manager 
 ```
 
 # Usage
