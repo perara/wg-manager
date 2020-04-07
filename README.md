@@ -22,6 +22,8 @@ docker run -d \
 --net host \
 -v wireguard-manager:/config \
 -e PORT="8888" \
+-e ADMIN_USERNAME="admin" \
+-e ADMIN_PASSWORD="admin \
 perara/wireguard-manager
 ```
 
@@ -39,5 +41,6 @@ When docker container is started, go to http://localhost:80
 ![Illustration](docs/images/4.png)
 
 # Roadmap
-* Add some insecure authentication
 * Eventual bugfixes
+* Improve Auth
+* Improve everything...
