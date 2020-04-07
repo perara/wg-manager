@@ -10,14 +10,19 @@ The following features is implemented:
 
 The interface runs in docker and requires the host to have installed wireguard, either as a dkms module, or by using newer kernels (5.6+)
 
+# Dependencies
+* wireguard-dkms or Linux kernel >= 5.6
+* docker
+
 # Installation
 ```bash
-docker build -t perara/wireguard-manager https://github.com/perara/wireguard-manager.git \
-&& docker run
--v ./config:/config
---cap-add NET_ADMIN
---net host
-perara/wireguard-manager 
+docker run -d \
+--cap-add NET_ADMIN \
+--name wireguard-manager \
+--net host \
+-v wireguard-manager:/config \
+-e PORT="8888" \
+perara/wireguard-manager
 ```
 
 # Usage
@@ -25,13 +30,13 @@ When docker container is started, go to http://localhost:80
 
 
 # Showcase
-![Illustration][docs/images/1.png]
+![Illustration](docs/images/1.png)
 
-![Illustration][docs/images/2.png]
+![Illustration](docs/images/2.png)
 
-![Illustration][docs/images/3.png]
+![Illustration](docs/images/3.png)
 
-![Illustration][docs/images/4.png]
+![Illustration](docs/images/4.png)
 
 # Roadmap
 * Add some insecure authentication
