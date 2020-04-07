@@ -1,6 +1,7 @@
 import logging
+import os
 
-from sqlalchemy.exc import OperationalError
+from sqlalchemy_utils import database_exists
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -21,7 +22,7 @@ from datetime import datetime, timedelta
 import db.wireguard
 import db.user
 import jwt
-from fastapi import Depends, FastAPI, HTTPException, status, Form
+from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt import PyJWTError
 import script.wireguard
@@ -35,16 +36,24 @@ engine = sqlalchemy.create_engine(
     const.DATABASE_URL, connect_args={"check_same_thread": False}
 )
 
-try:
-    models.Base.metadata.create_all(engine)
-except OperationalError as e:
-    pass
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/token")
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-app = FastAPI()
+if not database_exists(engine.url):
+    models.Base.metadata.create_all(engine)
+    # Create default user
+    _db: Session = SessionLocal()
+    _db.add(models.User(
+        username=os.getenv("ADMIN_USERNAME", "admin"),
+        password=db.user.get_password_hash(os.getenv("ADMIN_PASSWORD", "admin")),
+        full_name="Admin",
+        role="admin",
+        email=""
+    ))
+    _db.commit()
+    _db.close()
 
+app = FastAPI()
 
 # Dependency
 def get_db():
@@ -66,28 +75,45 @@ def create_access_token(*, data: dict, expires_delta: timedelta = None):
     return encoded_jwt
 
 
-def get_current_user(token: str = Depends(oauth2_scheme), sess: Session = Depends(get_db)):
+def auth(token: str = Depends(oauth2_scheme), sess: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+
     try:
         payload = jwt.decode(token, const.SECRET_KEY, algorithms=[const.ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
-        token_data = schemas.TokenData(username=username)
+
     except PyJWTError:
         raise credentials_exception
-    user = db.user.get_user_by_name(sess, token_data.username)
+    user = db.user.get_user_by_name(sess, username)
     if user is None:
         raise credentials_exception
     return user
 
 
-@app.post("/api/token", response_model=schemas.Token)
-def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), sess: Session = Depends(get_db)):
+@app.get("/api/logout")
+def logout(user: schemas.User = Depends(auth)):
+    # TODO
+    return {}
+
+
+@app.post("/api/user/edit", response_model=schemas.User)
+def edit(form_data: schemas.UserInDB, user: schemas.User = Depends(auth), sess: Session = Depends(get_db)):
+
+    form_data.password = db.user.get_password_hash(form_data.password)
+
+    db_user = db.user.update_user(sess, form_data)
+
+    return schemas.User.from_orm(db_user)
+
+
+@app.post("/api/login", response_model=schemas.Token)
+def login(form_data: OAuth2PasswordRequestForm = Depends(), sess: Session = Depends(get_db)):
     user = db.user.authenticate_user(sess, form_data.username, form_data.password)
 
     if not user:
@@ -96,17 +122,23 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), ses
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+    # Create token
     access_token_expires = timedelta(minutes=const.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+
+    return {"access_token": access_token, "token_type": "bearer", "user": schemas.User.from_orm(user)}
 
 
 # @app.post("/wg/update/", response_model=List[schemas.WireGuard])
 
 @app.get("/api/wg/server/all", response_model=typing.List[schemas.WGServer])
-def get_interfaces(sess: Session = Depends(get_db)):
+def get_interfaces(
+        sess: Session = Depends(get_db),
+        user: schemas.User = Depends(auth)
+):
     interfaces = db.wireguard.server_get_all(sess)
     for iface in interfaces:
         iface.is_running = script.wireguard.is_running(iface)
@@ -115,7 +147,11 @@ def get_interfaces(sess: Session = Depends(get_db)):
 
 
 @app.post("/api/wg/server/add", response_model=schemas.WGServer)
-def add_interface(form_data: schemas.WGServer, sess: Session = Depends(get_db)):
+def add_interface(
+        form_data: schemas.WGServer,
+        sess: Session = Depends(get_db),
+        user: schemas.User = Depends(auth)
+):
     if form_data.interface is None or form_data.listen_port is None or form_data.address is None:
         raise HTTPException(status_code=400,
                             detail="Interface, Listen-Port and Address must be included in the schema.")
@@ -136,7 +172,10 @@ def add_interface(form_data: schemas.WGServer, sess: Session = Depends(get_db)):
 
 
 @app.post("/api/wg/server/edit", response_model=schemas.WGServer)
-def edit_server(data: dict, sess: Session = Depends(get_db)):
+def edit_server(
+        data: dict, sess: Session = Depends(get_db),
+        user: schemas.User = Depends(auth)
+):
     interface = data["interface"]
     server = schemas.WGServer(**data["server"])
 
@@ -156,7 +195,7 @@ def edit_server(data: dict, sess: Session = Depends(get_db)):
 
 
 @app.get("/api/wg/generate_keypair", response_model=schemas.KeyPair)
-def generate_key_pair():
+def generate_key_pair(user: schemas.User = Depends(auth)):
     private_key, public_key = script.wireguard.generate_keys()
     return schemas.KeyPair(
         private_key=private_key,
@@ -165,21 +204,28 @@ def generate_key_pair():
 
 
 @app.get("/api/wg/generate_psk", response_model=schemas.PSK)
-def generate_psk():
+def generate_psk(user: schemas.User = Depends(auth)):
     return schemas.PSK(
         psk=script.wireguard.generate_psk()
     )
 
 
 @app.post("/api/wg/server/stop", response_model=schemas.WGServer)
-def start_server(form_data: schemas.WGServer, ):
+def start_server(
+        form_data: schemas.WGServer,
+        user: schemas.User = Depends(auth)
+):
     script.wireguard.stop_interface(form_data)
     form_data.is_running = script.wireguard.is_running(form_data)
     return form_data
 
 
 @app.post("/api/wg/server/start", response_model=schemas.WGServer)
-def start_server(form_data: schemas.WGServer, sess: Session = Depends(get_db)):
+def start_server(
+        form_data: schemas.WGServer,
+        sess: Session = Depends(get_db),
+        user: schemas.User = Depends(auth)
+):
     db.wireguard.server_generate_config(sess, form_data)
     script.wireguard.start_interface(form_data)
     form_data.is_running = script.wireguard.is_running(form_data)
@@ -187,7 +233,11 @@ def start_server(form_data: schemas.WGServer, sess: Session = Depends(get_db)):
 
 
 @app.post("/api/wg/server/restart", response_model=schemas.WGServer)
-def start_server(form_data: schemas.WGServer, sess: Session = Depends(get_db)):
+def start_server(
+        form_data: schemas.WGServer,
+        sess: Session = Depends(get_db),
+        user: schemas.User = Depends(auth)
+):
     db.wireguard.server_generate_config(sess, form_data)
     script.wireguard.restart_interface(form_data)
     form_data.is_running = script.wireguard.is_running(form_data)
@@ -195,7 +245,11 @@ def start_server(form_data: schemas.WGServer, sess: Session = Depends(get_db)):
 
 
 @app.post("/api/wg/server/delete", response_model=schemas.WGServer)
-def delete_server(form_data: schemas.WGServer, sess: Session = Depends(get_db)):
+def delete_server(
+        form_data: schemas.WGServer,
+        sess: Session = Depends(get_db),
+        user: schemas.User = Depends(auth)
+):
     # Stop if running
     if script.wireguard.is_running(form_data):
         script.wireguard.stop_interface(form_data)
@@ -206,7 +260,11 @@ def delete_server(form_data: schemas.WGServer, sess: Session = Depends(get_db)):
 
 
 @app.post("/api/wg/server/peer/add", response_model=schemas.WGPeer)
-def add_peer(form_data: schemas.WGServer, sess: Session = Depends(get_db)):
+def add_peer(
+        form_data: schemas.WGServer,
+        sess: Session = Depends(get_db),
+        user: schemas.User = Depends(auth)
+):
     wg_peer = schemas.WGPeer(server=form_data.interface)
 
     # Insert initial peer
@@ -222,7 +280,11 @@ def add_peer(form_data: schemas.WGServer, sess: Session = Depends(get_db)):
 
 
 @app.post("/api/wg/server/peer/delete", response_model=schemas.WGPeer)
-def delete_peer(form_data: schemas.WGPeer, sess: Session = Depends(get_db)):
+def delete_peer(
+        form_data: schemas.WGPeer,
+        sess: Session = Depends(get_db),
+        user: schemas.User = Depends(auth)
+):
     if not db.wireguard.peer_remove(sess, form_data):
         raise HTTPException(400, detail="Were not able to delete peer %s (%s)" % (form_data.name, form_data.public_key))
 
@@ -234,7 +296,11 @@ def delete_peer(form_data: schemas.WGPeer, sess: Session = Depends(get_db)):
 
 
 @app.post("/api/wg/server/peer/edit", response_model=schemas.WGPeer)
-def edit_peer(form_data: schemas.WGPeer, sess: Session = Depends(get_db)):
+def edit_peer(
+        form_data: schemas.WGPeer,
+        sess: Session = Depends(get_db),
+        user: schemas.User = Depends(auth)
+):
     wg_peer = db.wireguard.peer_update(sess, form_data)
     db.wireguard.peer_generate_config(sess, wg_peer)
 
@@ -242,13 +308,20 @@ def edit_peer(form_data: schemas.WGPeer, sess: Session = Depends(get_db)):
 
 
 @app.post("/api/wg/server/stats")
-def edit_peer(form_data: schemas.WGServer):
+def edit_peer(
+        form_data: schemas.WGServer,
+        user: schemas.User = Depends(auth)
+):
     stats = script.wireguard.get_stats(form_data)
     return JSONResponse(content=stats)
 
 
 @app.post("/api/wg/server/peer/config", response_model=schemas.WGPeerConfig)
-def config_peer(form_data: schemas.WGPeer, sess: Session = Depends(get_db)):
+def config_peer(
+        form_data: schemas.WGPeer,
+        sess: Session = Depends(get_db),
+        user: schemas.User = Depends(auth)
+):
     db_peer = db.wireguard.peer_query_get_by_address(sess, form_data.address, form_data.server).one()
 
     with open(const.PEER_FILE(db_peer), "r") as f:
@@ -258,7 +331,10 @@ def config_peer(form_data: schemas.WGPeer, sess: Session = Depends(get_db)):
 
 
 @app.post("/api/wg/server/config", response_model=schemas.WGPeerConfig)
-def config_server(form_data: schemas.WGServer):
+def config_server(
+        form_data: schemas.WGServer,
+        user: schemas.User = Depends(auth)
+):
     with open(const.SERVER_FILE(form_data.interface), "r") as f:
         conf_file = f.read()
 
@@ -266,7 +342,11 @@ def config_server(form_data: schemas.WGServer):
 
 
 @app.post("/api/users/create/")
-def create_user(form_data: schemas.UserInDB, sess: Session = Depends(get_db)):
+def create_user(
+        form_data: schemas.UserInDB,
+        sess: Session = Depends(get_db),
+        user: schemas.User = Depends(auth)
+):
     user = db.user.get_user_by_name(sess, form_data.username)
 
     # User already exists
@@ -291,6 +371,7 @@ def create_user(form_data: schemas.UserInDB, sess: Session = Depends(get_db)):
         password=form_data.password,
         scope=""
     ), sess)
+
 
 
 @app.on_event("startup")

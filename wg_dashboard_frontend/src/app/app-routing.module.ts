@@ -4,7 +4,11 @@ import { RouterModule } from '@angular/router';
 import { LayoutsModule } from './layouts';
 import { CommonLayoutComponent } from './layouts/common-layout';
 import { DashboardComponent } from './pages/dashboard';
-import {LoginComponent} from "./pages/pages/login";
+
+import {AuthGuard} from "@services/*";
+import {EditComponent} from "./pages/user/edit/edit.component";
+import {LoginComponent} from "./pages/user/login/login.component";
+
 
 
 @NgModule({
@@ -14,12 +18,21 @@ import {LoginComponent} from "./pages/pages/login";
         { path: '', redirectTo: 'app/dashboard', pathMatch: 'full' },
         { path: 'app', component: CommonLayoutComponent, children:
             [
-              { path: 'dashboard', component: DashboardComponent, pathMatch: 'full'}, // canActivate: [AuthGuard]
-              { path: 'login', component: LoginComponent, pathMatch: 'full'},
-              { path: '**', redirectTo: '/pages/404' },
+              { path: 'dashboard', component: DashboardComponent, pathMatch: 'full', canActivate: [AuthGuard]},
+
+
+              { path: '**', redirectTo: '/pages/404'},
             ]
         },
-        { path: 'pages', loadChildren: () => import('./pages/pages/pages.module').then(m => m.PagesModule) },
+
+        { path: 'user', component: CommonLayoutComponent, children:
+            [
+              { path: 'login', component: LoginComponent, pathMatch: 'full'},
+              { path: 'edit', component: EditComponent, pathMatch: 'full', canActivate: [AuthGuard]},
+            ]
+        },
+
+
         { path: '**', redirectTo: '/pages/404' },
       ],
       { useHash: true },

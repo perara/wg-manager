@@ -10,22 +10,19 @@ import { AuthService } from '@services/*';
 export class CommonLayoutComponent implements OnInit {
   public title = 'Wireguard Manager';
   public menu = [
-    { name: 'Dashboard', link: 'dashboard', icon: 'dashboard' },
+    { name: 'Dashboard', link: '/app/dashboard', icon: 'dashboard' },
   ];
-  public user;
 
-  constructor(private authService: AuthService,
-              private router: Router) {}
+
+  constructor(public auth: AuthService,
+              public router: Router) {}
 
   public ngOnInit() {
-    this.authService.userData.subscribe(user => this.user = user ? user : {
-      username: 'Luke',
-      email: 'Luke@skywalker.com',
-    });
+
   }
 
   public logout() {
-    this.authService.logout()
-      .subscribe(res => this.router.navigate(['/pages/login']));
+    this.auth.logout()
+      .subscribe(res => this.router.navigate(['/user/login']));
   }
 }

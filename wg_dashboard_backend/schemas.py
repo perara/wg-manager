@@ -3,24 +3,27 @@ from pydantic import BaseModel, typing
 import models
 
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
-class TokenData(BaseModel):
-    username: str = None
-
-
 class User(BaseModel):
     username: str = None
     email: str = None
     full_name: str = None
     role: str = None
 
+    class Config:
+        orm_mode = True
+
 
 class UserInDB(User):
     password: str
+
+    class Config:
+        orm_mode = True
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    user: User
 
     class Config:
         orm_mode = True

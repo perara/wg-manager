@@ -1,6 +1,10 @@
+from typing import Optional
+
 from sqlalchemy.orm import Session
 import models
 from passlib.context import CryptContext
+
+import schemas
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -13,13 +17,22 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-def authenticate_user(sess, username: str, password: str):
+def update_user(sess: Session, form_data: schemas.UserInDB):
+    user = get_user_by_name(sess, form_data.username)
+    user.password = form_data.password
+    user.full_name = form_data.full_name
+    user.email = form_data.email  # TOD this section should be updated
+
+    sess.add(user)
+    sess.commit()
+    return get_user_by_name(sess, form_data.username)
+
+
+def authenticate_user(sess, username: str, password: str) -> Optional[models.User]:
     user = get_user_by_name(sess, username)
-    if not user:
-        return False
-    if not verify_password(password, user.password):
-        return False
-    return user
+    if user and verify_password(password, user.password):
+        return user
+    return None
 
 
 def get_user_by_name(db: Session, username: str) -> models.User:

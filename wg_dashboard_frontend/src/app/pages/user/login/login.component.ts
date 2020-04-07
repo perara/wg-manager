@@ -1,37 +1,32 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-
-
-import { BlankLayoutCardComponent } from 'app/components/blank-layout-card';
+import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {AuthService} from "@services/*";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-login',
-  styleUrls: ['../../../components/blank-layout-card/blank-layout-card.component.scss'],
   templateUrl: './login.component.html',
+  styleUrls: ['./login.component.scss']
 })
-export class LoginComponent extends BlankLayoutCardComponent implements OnInit {
+export class LoginComponent implements OnInit {
+
   public loginForm: FormGroup;
-  public email;
+  public username;
   public password;
-  public emailPattern = '^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$';
   public error: string;
 
   constructor(private authService: AuthService,
               private fb: FormBuilder,
               private router: Router) {
-    super();
+
 
     this.loginForm = this.fb.group({
       password: new FormControl('', Validators.required),
-      email: new FormControl('', [
+      username: new FormControl('', [
         Validators.required,
-        Validators.pattern(this.emailPattern),
-        Validators.maxLength(20),
       ]),
     });
-    this.email = this.loginForm.get('email');
+    this.username = this.loginForm.get('username');
     this.password = this.loginForm.get('password');
   }
 
@@ -47,11 +42,12 @@ export class LoginComponent extends BlankLayoutCardComponent implements OnInit {
     if (this.loginForm.valid) {
       this.authService.login(this.loginForm.getRawValue())
         .subscribe(res => this.router.navigate(['/app/dashboard']),
-                   error => this.error = error.message);
+          error => this.error = error.message);
     }
   }
 
   public onInputChange(event) {
     event.target.required = true;
   }
+
 }

@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { environment } from '../../../environments/environment';
+import {User} from "../../interfaces/user";
 
 const tokenName = 'token';
 
@@ -12,74 +13,65 @@ const tokenName = 'token';
 })
 export class AuthService {
 
-  private isLogged$ = new BehaviorSubject(false);
-  private url = `${environment.apiBaseUrl}/api/auth`;
-  private user = { username: 'Luke', email: 'Luke@skywalker.com' }; // some data about user
+  public user: User = null;
+  private url = `${environment.apiBaseUrl}/api`;
 
-  constructor(private http: HttpClient) {
-
-  }
+  constructor(private http: HttpClient) {}
 
   public get isLoggedIn(): boolean {
-    return this.isLogged$.value;
+    return !!this.user?.access_token
   }
 
   public login(data): Observable<any> {
-    return this.http.post(`${this.url}/login`, data)
+    // Create form
+    let formData: FormData = new FormData();
+    formData.append('username', data.username);
+    formData.append('password', data.password);
+
+
+    return this.http.post(`${this.url}/login`, formData)
       .pipe(
-        map((res: { user: any, token: string }) => {
-          this.user = res.user;
-          localStorage.setItem(tokenName, res.token);
-          // only for example
-          localStorage.setItem('username', res.user.username);
-          localStorage.setItem('email', res.user.email);
-          this.isLogged$.next(true);
-          return this.user;
+        map((res: any) => {
+          this._handleUser(res);
         }));
+  }
+
+  public edit(formData: any){
+    return this.http.post(`${this.url}/user/edit`, formData)
+      .pipe(map((res: any) => {
+        this._handleUser(res);
+      }));
+  }
+
+  _handleUser(res: any){
+    const user: any = res.user;
+    user.access_token = res.access_token;
+    user.token_type = res.token_type;
+    localStorage.setItem("session", JSON.stringify(user));
+    this.init();
   }
 
   public logout() {
     return this.http.get(`${this.url}/logout`)
       .pipe(map((data) => {
-        localStorage.clear();
-        this.user = null;
-        this.isLogged$.next(false);
+        this.clearData();
         return of(false);
       }));
   }
 
-  public signup(data) {
-    return this.http.post(`${this.url}/signup`, data)
-      .pipe(
-        map((res: { user: any, token: string }) => {
-          this.user = res.user;
-          localStorage.setItem(tokenName, res.token);
-          // only for example
-          localStorage.setItem('username', res.user.username);
-          localStorage.setItem('email', res.user.email);
-          this.isLogged$.next(true);
-          return this.user;
-        }));
+
+  public clearData(){
+    this.user = null;
+    localStorage.clear();
+
   }
 
   public get authToken(): string {
     return localStorage.getItem(tokenName);
   }
 
-  public get userData(): Observable<any> {
-    // send current user or load data from backend using token
-    return this.loadUser();
-  }
 
-  private loadUser(): Observable<any> {
-    // use request to load user data with token
-    // it's fake and useing only for example
-    if (localStorage.getItem('username') && localStorage.getItem('email')) {
-      this.user = {
-        username: localStorage.getItem('username'),
-        email: localStorage.getItem('email'),
-      };
-    }
-    return of(this.user);
+  public init() {
+    this.user = JSON.parse(localStorage.getItem('session'));
   }
 }

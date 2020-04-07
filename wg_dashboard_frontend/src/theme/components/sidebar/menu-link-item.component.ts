@@ -30,7 +30,8 @@ export class MenuLinkItemComponent {
 
   private navigate() {
     const layout = (document.querySelector('.mdl-layout') as any).MaterialLayout;
-    if (layout.drawer_.getAttribute('aria-hidden') !== 'true') {
+
+    if (layout.drawer_ && layout.drawer_.getAttribute('aria-hidden') !== 'true') {
       layout.toggleDrawer();
     }
   }
