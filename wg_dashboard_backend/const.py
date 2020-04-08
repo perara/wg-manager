@@ -5,6 +5,10 @@ IS_DOCKER = os.getenv("IS_DOCKER", "False") == "True"
 DATABASE_FILE = "/config/database.db" if IS_DOCKER else "./database.db"
 DATABASE_URL = f"sqlite:///{DATABASE_FILE}"
 
+os.makedirs("build", exist_ok=True)
+
+DEFAULT_POST_UP = os.getenv("POST_UP", "iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE")
+DEFAULT_POST_DOWN = os.getenv("POST_DOWN", "iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE")
 
 SECRET_KEY = ''.join(random.choices(string.ascii_uppercase + string.digits, k=64))
 ALGORITHM = "HS256"

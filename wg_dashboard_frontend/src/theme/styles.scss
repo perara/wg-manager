@@ -1,25 +1,13 @@
 @import "./fonts/font-roboto.css";
 $material-icons-font-path: '~material-icons/iconfont/';
 @import '~material-icons/iconfont/material-icons.scss';
-@import './helpers';
-@import '~nvd3/build/nv.d3.css';
-@import '~material-design-lite/src/material-design-lite.scss';
-@import './scss/material-angular-select';
-@import './scss/layout';
-@import './scss/chip';
-@import './scss/badge';
-@import './scss/slider';
-@import './scss/menu';
-@import './scss/button';
-@import './scss/textfield';
-@import './scss/data-table';
-@import './scss/label';
-@import './scss/list';
-@import './scss/form';
-@import './scss/scroll';
-@import './scss/helper';
-@import './scss/table';
-@import './widgets/link';
-@import './widgets/chart-legend';
-@import './widgets/form';
-@import './widgets/input-group';
+@import "~material-design-lite/material.css";
+
+
+//html, body { height: 100%; }
+//body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html, body {
+  box-sizing: border-box;
+  height: 100%;
+  margin: 0;
+}

@@ -39,20 +39,6 @@ engine = sqlalchemy.create_engine(
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/token")
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-if not database_exists(engine.url):
-    models.Base.metadata.create_all(engine)
-    # Create default user
-    _db: Session = SessionLocal()
-    _db.add(models.User(
-        username=os.getenv("ADMIN_USERNAME", "admin"),
-        password=db.user.get_password_hash(os.getenv("ADMIN_PASSWORD", "admin")),
-        full_name="Admin",
-        role="admin",
-        email=""
-    ))
-    _db.commit()
-    _db.close()
-
 app = FastAPI()
 
 # Dependency
@@ -157,6 +143,9 @@ def add_interface(
                             detail="Interface, Listen-Port and Address must be included in the schema.")
 
     try:
+        form_data.post_up = form_data.post_up if form_data.post_up != "" else const.DEFAULT_POST_UP
+        form_data.post_down = form_data.post_up if form_data.post_up != "" else const.DEFAULT_POST_UP
+
         wg_server = db.wireguard.server_add(sess, form_data)
 
         # Public/Private key
@@ -195,7 +184,9 @@ def edit_server(
 
 
 @app.get("/api/wg/generate_keypair", response_model=schemas.KeyPair)
-def generate_key_pair(user: schemas.User = Depends(auth)):
+def generate_key_pair(
+        user: schemas.User = Depends(auth)
+):
     private_key, public_key = script.wireguard.generate_keys()
     return schemas.KeyPair(
         private_key=private_key,
@@ -373,10 +364,25 @@ def create_user(
     ), sess)
 
 
-
 @app.on_event("startup")
 async def startup():
     await database.connect()
+
+    # TODO - Fix
+    if not database_exists(engine.url):
+        models.Base.metadata.create_all(engine)
+        # Create default user
+        _db: Session = SessionLocal()
+        _db.add(models.User(
+            username=os.getenv("ADMIN_USERNAME", "admin"),
+            password=db.user.get_password_hash(os.getenv("ADMIN_PASSWORD", "admin")),
+            full_name="Admin",
+            role="admin",
+            email=""
+        ))
+        _db.commit()
+        _db.close()
+
 
 
 @app.on_event("shutdown")

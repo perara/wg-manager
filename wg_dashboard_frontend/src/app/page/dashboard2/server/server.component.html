@@ -1,0 +1,248 @@
+
+<mat-card class="dashboard-card">
+  <mat-card-header class="server-card-header">
+    <mat-card-title>
+      <span>{{server.interface}}</span>
+
+      <!-- This fills the remaining space of the current row -->
+      <span class="fill-remaining-space"></span>
+
+      <i class="material-icons" [ngClass]="{'text-success': server.is_running, 'text-danger': !server.is_running}">check_circle</i>
+
+      <app-modal-confirm
+        [qrCode]="true"
+        [noConfirm]="false"
+        area="true"
+        icon="settings"
+        title="Configuration"
+        [text]="serverConfig"
+        hover="Show config for {{server.interface}}">
+      </app-modal-confirm>
+
+      <span>
+
+        <app-modal-confirm
+          [noConfirm]="true"
+          (onConfirm)="addPeer()"
+          icon="person_add"
+          hover="Add peer to {{server.interface}}">
+        </app-modal-confirm>
+
+        <app-modal-confirm
+          *ngIf="!server.is_running"
+          [noConfirm]="true"
+          (onConfirm)="start()"
+          icon="play_arrow"
+          hover="Start {{server.interface}}">
+        </app-modal-confirm>
+
+        <app-modal-confirm
+          *ngIf="server.is_running"
+          [noConfirm]="false"
+          (onConfirm)="stop()"
+          title="Stop server {{server.interface}}?"
+          text="Are you sure you want to stop this server? This may cause you or your clients to lose connection to the server."
+          icon="stop"
+          hover="Stop {{server.interface}}">
+        </app-modal-confirm>
+
+        <app-modal-confirm
+          [noConfirm]="false"
+          (onConfirm)="restart()"
+          title="Restart server {{server.interface}}?"
+          text="Are you sure you want to restart this server? This may cause you or your clients to lose connection to the server."
+          icon="autorenew"
+          hover="Restart {{server.interface}}">
+        </app-modal-confirm>
+
+        <app-modal-confirm
+          [noConfirm]="true"
+          (onConfirm)="edit()"
+          icon="edit"
+          hover="Edit {{server.interface}}">
+        </app-modal-confirm>
+
+        <app-modal-confirm
+          (onConfirm)="delete()"
+          title="Delete {{server.interface}}"
+          text="Are you sure you want to delete {{server.interface}}"
+          icon="delete"
+          hover="Delete {{server.interface}}">
+        </app-modal-confirm>
+      </span>
+
+
+
+    </mat-card-title>
+    <mat-card-subtitle>{{server.address}} @ {{server.endpoint}}</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content class="dashboard-card-content">
+
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Address</th>
+          <th>Public-Key</th>
+          <th>Total tx/rx</th>
+          <th>Handshake</th>
+          <th>Manage</th>
+        </tr>
+      </thead>
+
+
+      <tbody>
+        <ng-container *ngFor="let peer of server.peers; let idx = index;" (click)="selectedPeer = (selectedPeer != peer)? peer : null">
+
+            <tr (click)="openPeer(peer)">
+              <td>{{peer.name}}</td>
+              <td>{{peer.address}}</td>
+              <td>{{peer.public_key}}</td>
+              <td>{{peer._stats?.tx || '0'}}/{{peer._stats?.rx || '0'}}</td>
+              <td>{{peer._stats?.handshake || 'N/A'}}</td>
+              <td>
+
+                <!-- Edit buttons -->
+                <app-modal-confirm
+                  [noConfirm]="true"
+                  (onConfirm)="this.editPeerEmitter.emit({type: 'edit', peer: peer})"
+                  icon="edit"
+                  hover="Edit {{peer.name}}">
+                </app-modal-confirm>
+
+                <app-modal-confirm
+                  [noConfirm]="false"
+                  (onConfirm)="this.editPeerEmitter.emit({type: 'delete', peer: peer});"
+                  text="Are you sure you want to delete {{peer.name}} ({{peer.public_key}})?"
+                  title="Delete {{peer.name}}"
+                  icon="delete"
+                  hover="Delete {{peer.name}} ({{peer.public_key}})">
+                </app-modal-confirm>
+
+
+
+              </td>
+            </tr>
+            <tr [hidden]="peer !== selectedPeer">
+              <td colspan="6">
+                  <app-peer [onEvent]="this.editPeerEmitter" [(peer)]="server.peers[idx]" [(server)]="server"></app-peer>
+              </td>
+            </tr>
+
+
+        </ng-container>
+      </tbody>
+    </table>
+
+
+
+
+  </mat-card-content>
+  <mat-card-actions>
+  </mat-card-actions>
+</mat-card>
+
+
+
+<!--
+<mat-card class="dashboard-card">
+  <mat-card-content class="dashboard-card-content">
+    *Server*
+    <ng-container >
+
+
+    </ng-container>
+  </mat-card-content>
+</mat-card>
+
+
+-->
+
+<!--
+<div class=" mdl-card mdl-shadow--2dp">
+  <div class="mdl-card__title mdl-card--border">
+    <h2 class="mdl-card__title-text">{{server.interface}}</h2>
+    <span style="width:20px;"></span>
+
+
+
+  </div>
+
+  <div class="mdl-card__actions">
+
+    <div class="mdl-grid peer-item-header">
+      <div class="mdl-cell--2-col mdl-cell--12-col-phone">Name</div>
+      <div class="mdl-cell--2-col mdl-cell--12-col-phone">Address</div>
+      <div class="mdl-cell--3-col mdl-cell--12-col-phone">Public-Key</div>
+      <div class="mdl-cell--2-col mdl-cell--12-col-phone">Total tx/rx</div>
+      <div class="mdl-cell--2-col mdl-cell--12-col-phone">Handshake</div>
+      <div class="mdl-cell--2-col mdl-cell--12-col-phone">Manage</div>
+    </div>
+
+
+    <div style="cursor: pointer;" *ngFor="let peer of server.peers; let idx = index;" >
+      <app-peer [(peer)]="server.peers[idx]" [(server)]="server"></app-peer>
+    </div>
+
+  </div>
+
+  <div class="mdl-card__supporting-text">
+  </div>
+
+
+
+
+  <div class="mdl-card__menu">
+
+    <app-modal-confirm
+      [noConfirm]="true"
+      (onConfirm)="addPeer()"
+      icon="person_add"
+      hover="Add peer to {{server.interface}}">
+    </app-modal-confirm>
+
+    <app-modal-confirm
+      *ngIf="!server.is_running"
+      [noConfirm]="true"
+      (onConfirm)="start()"
+      icon="play_arrow"
+      hover="Start {{server.interface}}">
+    </app-modal-confirm>
+
+    <app-modal-confirm
+      *ngIf="server.is_running"
+      [noConfirm]="false"
+      (onConfirm)="stop()"
+      title="Stop server {{server.interface}}?"
+      text="Are you sure you want to stop this server? This may cause you or your clients to lose connection to the server."
+      icon="stop"
+      hover="Stop {{server.interface}}">
+    </app-modal-confirm>
+
+    <app-modal-confirm
+      [noConfirm]="false"
+      (onConfirm)="restart()"
+      title="Restart server {{server.interface}}?"
+      text="Are you sure you want to restart this server? This may cause you or your clients to lose connection to the server."
+      icon="autorenew"
+      hover="Restart {{server.interface}}">
+    </app-modal-confirm>
+
+    <app-modal-confirm
+      [noConfirm]="true"
+      (onConfirm)="edit()"
+      icon="edit"
+      hover="Edit {{server.interface}}">
+    </app-modal-confirm>
+
+    <app-modal-confirm
+      (onConfirm)="delete()"
+      title="Delete {{server.interface}}"
+      text="Are you sure you want to delete {{server.interface}}"
+      icon="delete"
+      hover="Delete {{server.interface}}">
+    </app-modal-confirm>
+  </div>
+</div>-->

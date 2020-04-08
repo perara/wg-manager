@@ -114,6 +114,8 @@ def remove_peer(server: schemas.WGServer, peer: schemas.WGPeer):
 def get_stats(server: schemas.WGServer):
     try:
         output = _run_wg(server, ["show", server.interface])
+        if not output:
+            return []
         regex = r"peer:.*?^\n"
         test_str = output.decode("utf-8") + "\n"
 
@@ -155,4 +157,4 @@ def get_stats(server: schemas.WGServer):
         return peers
     except Exception as e:
         _LOGGER.exception(e)
-        return False
+        return []

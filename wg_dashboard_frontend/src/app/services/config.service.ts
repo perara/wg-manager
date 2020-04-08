@@ -7,6 +7,8 @@ import {throwError} from "rxjs";
 })
 export class ConfigService {
 
+  public applicationName = "Wireguard Manager";
+
   constructor() { }
 
   public handleError(error: HttpErrorResponse) {

@@ -33,7 +33,7 @@ export class AuthInterceptor implements HttpInterceptor {
           }
 
           this.auth.clearData();
-          this.router.navigate(['user/login']);
+          this.router.navigate(['/page/user/login']);
         }
       }));
   }

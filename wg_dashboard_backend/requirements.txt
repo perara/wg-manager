@@ -9,3 +9,4 @@ passlib
 bcrypt
 python-multipart
 jinja2
+sqlalchemy_utils

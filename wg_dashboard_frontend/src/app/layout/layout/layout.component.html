@@ -1,0 +1,56 @@
+<div style="height: 100vh;">
+
+
+  <mat-toolbar color="primary">
+    <mat-toolbar-row>
+      <button mat-icon-button (click)="sidenav.toggle()" fxShow="true" fxHide.gt-sm>
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span>{{config.applicationName}}</span>
+      <span class="example-spacer"></span>
+      <div fxShow="true" fxHide.lt-md="true">
+
+        <!-- The following menu items will be hidden on both SM and XS screen sizes -->
+
+        <a *ngFor="let item of menu" [routerLink]="item.link" mat-button>
+          <mat-icon>{{item.icon}}</mat-icon>
+          {{item.text}}
+        </a>
+
+      </div>
+    </mat-toolbar-row>
+
+  </mat-toolbar>
+
+  <mat-sidenav-container fxFlexFill>
+    <mat-sidenav #sidenav>
+      <mat-nav-list>
+        <a href="#" mat-list-item>
+          <mat-icon>notifications</mat-icon>
+          Notifications
+        </a>
+        <a href="#" mat-list-item>
+          <mat-icon>message</mat-icon>
+          Messages</a>
+        <a href="#" mat-list-item>
+          <mat-icon>account_box</mat-icon>
+          My Account
+        </a>
+        <a href="#" mat-list-item>
+          <mat-icon>lock</mat-icon>
+          My Account
+        </a>
+        <a (click)="sidenav.toggle()" mat-list-item>
+          <mat-icon>close</mat-icon> Close
+        </a>
+      </mat-nav-list>
+    </mat-sidenav>
+    <mat-sidenav-content fxFlexFill>
+      <router-outlet></router-outlet>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+
+
+
+
+</div>
