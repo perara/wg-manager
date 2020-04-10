@@ -1,48 +1,55 @@
-<div class="container">
+<div flex fxFill fxLayout="row" fxLayoutAlign="center center" >
+  <div fxFlex="33">
 
-<base-card>
-  <base-card-title>
-    <h2 class="mdl-card__title-text">Edit User</h2>
-  </base-card-title>
-  <base-card-body>
-
-    <form [formGroup]="editForm" (ngSubmit)="editForm.valid && edit()" class="form">
-
-      <div class="mdl-grid">
-        <div class="mdl-cell mdl-cell--6-col mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-          <input formControlName="full_name" class="mdl-textfield__input" type="text" id="full_name"  value=""/>
-          <label class="mdl-textfield__label" for="full_name">Full Name</label>
-        </div>
-
-
-        <div class="mdl-cell mdl-cell--6-col mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-          <input formControlName="username" class="mdl-textfield__input" type="text" id="username" />
-          <label class="mdl-textfield__label" for="username">Username</label>
-        </div>
-
-        <div class="mdl-cell mdl-cell--6-col mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-          <input formControlName="password" class="mdl-textfield__input" type="text" id="password"/>
-          <label class="mdl-textfield__label" for="password">Password</label>
-        </div>
-
-        <div class="mdl-cell mdl-cell--6-col mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-          <input formControlName="email" class="mdl-textfield__input" type="text" id="email"/>
-          <label class="mdl-textfield__label" for="email">Email</label>
-        </div>
-
-      </div>
-
-
-      <button [disabled]="!editForm.valid" type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue">
+    <mat-card>
+      <mat-card-title>
         Edit User
-      </button>
+      </mat-card-title>
+
+      <mat-card-content>
+        <form [formGroup]="editForm" (ngSubmit)="editForm.valid && edit()" class="form">
+
+          <p>
+            <mat-form-field class="full-width">
+              <mat-label>Full Name</mat-label>
+              <input type="text" id="full_name" formControlName="full_name" matInput>
+            </mat-form-field>
+          </p>
+
+          <p>
+            <mat-form-field class="full-width">
+              <mat-label>Username</mat-label>
+              <input type="text" id="username" formControlName="username" matInput>
+            </mat-form-field>
+          </p>
+
+          <p>
+            <mat-form-field class="full-width">
+              <mat-label>E-Mail</mat-label>
+              <input type="text" id="email" formControlName="email"  matInput>
+            </mat-form-field>
+          </p>
+
+          <p>
+            <mat-form-field class="full-width">
+              <mat-label>Password</mat-label>
+              <input type="password" id="password" formControlName="password"  matInput>
+            </mat-form-field>
+          </p>
+
+          <button mat-raised-button color="primary" [disabled]="!editForm.valid" type="submit">
+            Edit User
+          </button>
+
+
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
 
 
 
-    </form>
-
-
-  </base-card-body>
-</base-card>
 
 </div>
+
+

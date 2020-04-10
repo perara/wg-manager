@@ -1,9 +1,8 @@
 import sqlalchemy
 from sqlalchemy import Integer, Column
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 
-Base = declarative_base()
+from database import Base
 
 
 class User(Base):
@@ -15,21 +14,6 @@ class User(Base):
     username = Column(sqlalchemy.String, unique=True)
     full_name = Column(sqlalchemy.String)
     role = Column(sqlalchemy.String)
-
-
-class WGPeer(Base):
-    __tablename__ = "peer"
-
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(sqlalchemy.String, default="Unnamed")
-    address = Column(sqlalchemy.String)
-    public_key = Column(sqlalchemy.String)
-    private_key = Column(sqlalchemy.String)
-    dns = Column(sqlalchemy.String)
-    allowed_ips = Column(sqlalchemy.String)
-
-    server = Column(Integer, sqlalchemy.ForeignKey('server.interface'))
-    server_ref = relationship("WGServer", backref="server")
 
 
 class WGServer(Base):
@@ -46,7 +30,25 @@ class WGServer(Base):
 
     post_up = Column(sqlalchemy.String)
     post_down = Column(sqlalchemy.String)
-
     is_running = Column(sqlalchemy.Boolean)
+    configuration = Column(sqlalchemy.Text)
 
-    peers = relationship("WGPeer", backref="peer")
+    peers = relationship("WGPeer", cascade="all, delete", passive_deletes=True, lazy="joined")
+
+
+class WGPeer(Base):
+    __tablename__ = "peer"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(sqlalchemy.String, default="Unnamed")
+    address = Column(sqlalchemy.String)
+    public_key = Column(sqlalchemy.String)
+    private_key = Column(sqlalchemy.String)
+    dns = Column(sqlalchemy.String)
+    allowed_ips = Column(sqlalchemy.String)
+
+    server_id = Column(Integer, sqlalchemy.ForeignKey('server.id', ondelete="CASCADE", onupdate="CASCADE"))
+    server = relationship("WGServer", backref=backref("server"))
+    configuration = Column(sqlalchemy.Text)
+
+

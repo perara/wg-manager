@@ -10,8 +10,8 @@ import {
 } from '@angular/common/http';
 
 import { AuthService } from './auth.service';
-import {tap} from "rxjs/operators";
-import {Router} from "@angular/router";
+import { tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -21,13 +21,13 @@ export class AuthInterceptor implements HttpInterceptor {
     // add authorization token for full api requests
     if (request.url.includes('api') && this.auth.isLoggedIn) {
       request = request.clone({
-        setHeaders: { Authorization: `Bearer ${this.auth.user.access_token}`},
+        setHeaders: { Authorization: `Bearer ${this.auth.user.access_token}` },
       });
     }
 
-    return next.handle(request).pipe( tap(() => {},
-      (err: any) => {
-        if (err instanceof HttpErrorResponse) {
+    return next.handle(request).pipe(tap(() => {},
+                                         (err: any) => {
+                                           if (err instanceof HttpErrorResponse) {
           if (err.status !== 401 && err.status !== 403) {
             return;
           }
@@ -35,6 +35,6 @@ export class AuthInterceptor implements HttpInterceptor {
           this.auth.clearData();
           this.router.navigate(['/page/user/login']);
         }
-      }));
+                                         }));
   }
 }

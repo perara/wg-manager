@@ -15,11 +15,14 @@ The interface runs in docker and requires the host to have installed wireguard, 
 * docker
 
 # Installation
+
+## Docker
 ```bash
 docker run -d \
 --cap-add NET_ADMIN \
 --name wireguard-manager \
 --net host \
+-p "51800-51900:51800-51900/udp" \
 -v wireguard-manager:/config \
 -e PORT="8888" \
 -e ADMIN_USERNAME="admin" \
@@ -27,11 +30,47 @@ docker run -d \
 perara/wireguard-manager
 ```
 
+## Docker-compose
+```yaml
+  wireguard:
+    container_name: wireguard-manager
+    image: perara/wireguard-manager
+    cap_add:
+      - NET_ADMIN
+    ports:
+       - 51800:51900/udp
+       - 8888:8888
+    volumes:
+      - ./ops/wireguard/_data:/config
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8888
+      ADMIN_PASSWORD: admin
+      ADMIN_USERNAME: admin
+      WEB_CONCURRENCY: 1
+```
+
+# Environment variables
+| Environment      | Description                                                              | Recommended |
+|------------------|--------------------------------------------------------------------------|-------------|
+| GUNICORN_CONF    | Location of custom gunicorn configuration                                | default     |
+| WORKERS_PER_CORE | How many concurrent workers should there be per available core (Gunicorn | default     |
+| WEB_CONCURRENCY  | The number of worker processes for handling requests. (Gunicorn)         | 1           |
+| HOST             | 0.0.0.0 or unix:/tmp/gunicorn.sock if reverse proxy. Remember to mount   | 0.0.0.0     |
+| PORT             | The port to use if running with IP host bind                             | 80          |
+| LOG_LEVEL        | Logging level of gunicorn/python                                         | info        |
+| ADMIN_USERNAME   | Default admin username on database creation                              | admin       |
+| ADMIN_PASSWORD   | Default admin password on database creation                              | admin       |
 # Usage
 When docker container is started, go to http://localhost:80
 
+# Reverse Proxy
+Use jwilder/nginx-proxy or similar.
+
 
 # Showcase
+![Illustration](docs/images/0.png)
+
 ![Illustration](docs/images/1.png)
 
 ![Illustration](docs/images/2.png)
@@ -39,6 +78,14 @@ When docker container is started, go to http://localhost:80
 ![Illustration](docs/images/3.png)
 
 ![Illustration](docs/images/4.png)
+
+![Illustration](docs/images/5.png)
+
+![Illustration](docs/images/6.png)
+
+![Illustration](docs/images/7.png)
+
+![Illustration](docs/images/8.png)
 
 # Roadmap
 * Eventual bugfixes

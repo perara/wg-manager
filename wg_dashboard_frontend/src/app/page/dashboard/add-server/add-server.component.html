@@ -1,0 +1,110 @@
+<mat-card class="dashboard-card">
+  <mat-card-content class="dashboard-card-content">
+
+    <form [formGroup]="serverForm" class="add-server-form">
+
+      <p><b>Essentials</b></p>
+      <table class="add-server-full-width" cellspacing="0"><tr>
+        <td>
+          <mat-form-field class="add-server-full-width">
+          <mat-label>Interface</mat-label>
+          <input formControlName="interface" matInput placeholder="wg0">
+          </mat-form-field>
+        </td>
+        <td>
+          <mat-form-field class="add-server-full-width">
+          <mat-label>Address Scope</mat-label>
+          <input formControlName="address" matInput placeholder="10.0.200.1/24">
+          </mat-form-field>
+        </td>
+      </tr></table>
+
+      <table class="add-server-full-width" cellspacing="0"><tr>
+        <td>
+          <mat-form-field class="add-server-full-width">
+            <mat-label>Endpoint</mat-label>
+            <input formControlName="endpoint" matInput placeholder="my-address.com">
+          </mat-form-field>
+        </td>
+        <td>
+          <mat-form-field class="add-server-full-width">
+            <mat-label>Port</mat-label>
+            <input formControlName="listen_port" matInput placeholder="51820">
+          </mat-form-field>
+        </td>
+      </tr></table>
+
+      <p><b>Keys</b></p>
+      <p>
+        <mat-form-field class="add-server-full-width">
+          <mat-label>Private-Key</mat-label>
+          <input formControlName="private_key" matInput>
+        </mat-form-field>
+      </p>
+
+      <p>
+        <mat-form-field class="add-server-full-width">
+          <mat-label>Public-Key</mat-label>
+          <input formControlName="public_key" matInput>
+        </mat-form-field>
+      </p>
+
+      <p>
+        <mat-form-field class="add-server-full-width">
+          <mat-label>Shared-Key</mat-label>
+          <input formControlName="shared_key" matInput>
+        </mat-form-field>
+      </p>
+
+      <div class="button-row">
+        <button type="button" [disabled]="!isEdit" (click)="getKeyPair()" mat-raised-button color="primary">
+          <i class="material-icons">vpn_key</i>
+          Generate KeyPair
+        </button>
+        <button type="button" [disabled]="!isEdit" (click)="getPSK()" mat-raised-button color="primary">
+          <i class="material-icons">share</i>
+          Generate PSK
+        </button>
+      </div>
+
+      <p><b>Scripts</b></p>
+      <p>
+        <mat-form-field class="add-server-full-width">
+          <mat-label>Post-Up</mat-label>
+          <input formControlName="post_up" matInput>
+        </mat-form-field>
+      </p>
+
+      <p>
+        <mat-form-field class="add-server-full-width">
+          <mat-label>Post-Down</mat-label>
+          <input formControlName="post_down" matInput>
+        </mat-form-field>
+      </p>
+
+      <div class="button-row">
+
+        <button mat-raised-button color="primary"
+                type="submit"
+                [disabled]="!serverForm.valid"
+                (click)="serverForm.valid && add(serverForm.value)"
+                (keydown.enter)="serverForm.valid && add(serverForm.value)"
+        >
+          <ng-container *ngIf="!isEdit">Add Server</ng-container>
+          <ng-container *ngIf="isEdit">Edit Server</ng-container>
+        </button>
+
+        <button mat-raised-button color="warn" (click)="isEdit = false; serverForm.reset()">
+          Reset
+        </button>
+
+      </div>
+
+    </form>
+
+
+
+
+
+  </mat-card-content>
+</mat-card>

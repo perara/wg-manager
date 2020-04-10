@@ -1,40 +1,42 @@
+<div flex fxFill fxLayout="row" fxLayoutAlign="center center" >
+  <div fxFlex="33">
+
+    <mat-card>
+      <mat-card-title>
+        Authenticate to Wireguard Management
+      </mat-card-title>
+
+      <mat-card-content>
+        <form [formGroup]="loginForm" (ngSubmit)="loginForm.valid && login()" class="form">
+
+          <p>
+            <mat-form-field class="full-width">
+              <mat-label>Username</mat-label>
+              <input type="text" id="username" formControlName="username" matInput>
+            </mat-form-field>
+          </p>
+
+          <p>
+            <mat-form-field class="full-width">
+              <mat-label>Password</mat-label>
+              <input type="password" id="password" autocomplete="on" formControlName="password"  matInput>
+            </mat-form-field>
+          </p>
 
 
-<mat-card>
-  <mat-card-title>
-    Authenticate to Wireguard Management
-  </mat-card-title>
+          <button mat-raised-button color="primary" [disabled]="!loginForm.valid" type="submit">
+            SIGN IN
+          </button>
 
-  <mat-card-content>
-    <form [formGroup]="loginForm" (ngSubmit)="loginForm.valid && login()" class="form">
-
-      <p>
-        <mat-form-field class="full-width">
-          <mat-label>Username</mat-label>
-          <input type="text" id="username" formControlName="username" matInput>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field class="full-width">
-          <mat-label>Password</mat-label>
-          <input type="text" id="password" formControlName="password"  matInput>
-        </mat-form-field>
-      </p>
-
-
-      <button [disabled]="!loginForm.valid" type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue">
-        SIGN IN
-      </button>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
 
 
 
 
+</div>
 
-    </form>
-  </mat-card-content>
-
-
-</mat-card>
 
 

@@ -6,12 +6,13 @@ export interface Peer {
   dns: string;
   allowed_ips: string;
   name: string;
+  configuration: string;
   stats: {
     sent: string,
     received: string,
-    handshake: string
-  }
+    handshake: string,
+  };
 
   _expand?: boolean;
-  _edit?: boolean
+  _edit?: boolean;
 }

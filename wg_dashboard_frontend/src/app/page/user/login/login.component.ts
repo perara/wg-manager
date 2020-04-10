@@ -1,12 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
-import {AuthService} from "@services/*";
-import {Router} from "@angular/router";
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from '@services/*';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  encapsulation: ViewEncapsulation.None,
+  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit {
 
@@ -19,7 +20,6 @@ export class LoginComponent implements OnInit {
               private fb: FormBuilder,
               private router: Router) {
 
-
     this.loginForm = this.fb.group({
       password: new FormControl('', Validators.required),
       username: new FormControl('', [
@@ -31,7 +31,7 @@ export class LoginComponent implements OnInit {
   }
 
   public ngOnInit() {
-    this.authService.logout();
+
     this.loginForm.valueChanges.subscribe(() => {
       this.error = null;
     });
@@ -42,7 +42,7 @@ export class LoginComponent implements OnInit {
     if (this.loginForm.valid) {
       this.authService.login(this.loginForm.getRawValue())
         .subscribe(res => this.router.navigate(['/page/dashboard']),
-          error => this.error = error.message);
+                   error => this.error = error.message);
     }
   }
 

@@ -1,15 +1,24 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation} from '@angular/core';
-import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {
+  Component,
+  ContentChild,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  TemplateRef, ViewChild, ViewContainerRef,
+  ViewEncapsulation
+} from '@angular/core';
+import {NgForOfContext} from "@angular/common";
 
 @Component({
   selector: 'app-modal-confirm',
   templateUrl: './modal-confirm.component.html',
-  encapsulation: ViewEncapsulation.None,
-  styleUrls: ['./modal-confirm.component.scss']
+  encapsulation: ViewEncapsulation.Emulated,
+  styleUrls: ['./modal-confirm.component.scss'],
 })
-export class ModalConfirmComponent implements OnInit{
-  @Input() noConfirm: boolean = false;
-  @Input() qrCode: boolean = false;
+export class ModalConfirmComponent implements OnInit {
+  @Input() noConfirm = false;
+  @Input() qrCode = false;
   @Input() icon: string;
   @Input() hover: string;
   @Input() title: string;
@@ -17,40 +26,42 @@ export class ModalConfirmComponent implements OnInit{
   @Input()  area: boolean;
   @Output() onCancel: EventEmitter<any> = new EventEmitter();
   @Output() onConfirm: EventEmitter<any> = new EventEmitter();
-  constructor(public modal: NgbModal) {
+
+  @ViewChild('modal', { read: TemplateRef }) _template: TemplateRef<any>;
+  @ViewChild('vc', {read: ViewContainerRef}) vc: ViewContainerRef;
+  shown = false;
+
+  constructor() {
+
 
   }
 
-  open($event, content) {
-    $event.stopPropagation();
-    if(this.noConfirm) {
+  open($event){
+    if (this.noConfirm) {
       this.onConfirm.emit();
       return true;
     }
 
-    this.modal.open(content, {
-      ariaLabelledBy: 'modal-basic-title',
-      backdropClass: "light-blue-backdrop",
-      windowClass: "dark-modal"
-    }).result.then((result) => {
-      if(result === "cancel"){
-        this.onCancel.emit()
-      }else if(result === "confirm"){
-        this.onConfirm.emit();
-      }
+    this.shown = true;
+    //this.vc.createEmbeddedView(this._template, {fromContext: 'John'});
 
-    }, (reason) => {
+  }
+  confirm($event){
+    $event.stopPropagation();
+    this.onConfirm.emit();
+    this.shown=  false;
 
-    });
+  }
+
+  cancel($event){
+    this.onCancel.emit();
+    this.shown = false
   }
 
   ngOnInit(): void {
 
     this.area = this.area || false;
-    this.area = !!this.area
+    this.area = !!this.area;
   }
-
-
-
 
 }

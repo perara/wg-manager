@@ -1,4 +1,4 @@
-<div style="height: 100vh;">
+<div style="height: 100vh; ">
 
 
   <mat-toolbar color="primary">
@@ -7,10 +7,7 @@
         <mat-icon>menu</mat-icon>
       </button>
       <span>{{config.applicationName}}</span>
-      <span class="example-spacer"></span>
       <div fxShow="true" fxHide.lt-md="true">
-
-        <!-- The following menu items will be hidden on both SM and XS screen sizes -->
 
         <a *ngFor="let item of menu" [routerLink]="item.link" mat-button>
           <mat-icon>{{item.icon}}</mat-icon>
@@ -18,6 +15,38 @@
         </a>
 
       </div>
+
+      <span class="menu-spacer"></span>
+
+      <ng-container *ngIf="auth.isLoggedIn">
+        <button mat-button [matMenuTriggerFor]="menu2">Logged in as {{auth.user.username}}</button>
+        <mat-menu #menu2="matMenu">
+          <button mat-menu-item [routerLink]="['/page/user/edit']">
+            Edit User
+          </button>
+          <button mat-menu-item (click)="auth.logout().subscribe()">
+            Logout
+          </button>
+
+          <button mat-menu-item [matMenuTriggerFor]="themeMenu">
+            Themes
+          </button>
+        </mat-menu>
+
+        <mat-menu #themeMenu="matMenu">
+          <button mat-menu-item *ngFor="let theme of themes" (click)="setCurrentTheme(theme)">{{theme.name}}</button>
+          <mat-slide-toggle
+            style="margin-top: 10px;"
+            color="primary"
+            (click)="toggleDarkMode($event);"
+            [checked]="darkMode">
+            Dark
+          </mat-slide-toggle>
+        </mat-menu>
+
+      </ng-container>
+
+
     </mat-toolbar-row>
 
   </mat-toolbar>

@@ -1,0 +1,85 @@
+<div
+  fxLayout="row"
+
+>
+  <div
+    fxFlex="50"
+    fxFlex.lt-lg="100">
+
+
+    <form #peerForm="ngForm" class="peer-edit-form" (ngSubmit)="peerForm.valid && edit()" >
+
+      <b>Essentials</b>
+      <table class="full-width" cellspacing="0"><tr>
+        <td>
+          <mat-form-field class="full-width">
+            <mat-label>Name</mat-label>
+            <input [disabled]="!peer._edit" name="name" matInput [(ngModel)]="peer.name">
+          </mat-form-field>
+        </td>
+        <td>
+          <mat-form-field class="full-width">
+            <mat-label>Address</mat-label>
+            <input [disabled]="!peer._edit" name="address" matInput [(ngModel)]="peer.address">
+          </mat-form-field>
+        </td>
+      </tr></table>
+
+      <p>
+        <mat-form-field class="full-width">
+          <mat-label>DNS</mat-label>
+          <input [disabled]="!peer._edit" name="dns" [(ngModel)]="peer.dns" matInput>
+        </mat-form-field>
+      </p>
+
+
+      <p>
+        <mat-form-field class="full-width">
+          <mat-label>Allowed IPs</mat-label>
+          <input [disabled]="!peer._edit" name="allowed_ips" [(ngModel)]="peer.allowed_ips" matInput>
+        </mat-form-field>
+      </p>
+
+
+      <p>Keys</p>
+      <p>
+        <mat-form-field class="full-width">
+          <mat-label>Private-Key</mat-label>
+          <input [disabled]="!peer._edit" name="private_key" [(ngModel)]="peer.private_key" matInput>
+        </mat-form-field>
+      </p>
+
+      <p>
+        <mat-form-field class="full-width">
+          <mat-label>Public-Key</mat-label>
+          <input [disabled]="!peer._edit" name="public_key" [(ngModel)]="peer.public_key" matInput>
+        </mat-form-field>
+      </p>
+
+      <button
+        [hidden]="!peer._edit"
+        [disabled]="!peerForm.valid"
+        type="submit"
+        mat-raised-button color="primary">
+        Submit changes
+      </button>
+
+    </form>
+
+  </div>
+
+  <div
+    fxFlex="25"
+    fxFlex.lt-lg="100"
+  >
+    <textarea readonly class="full-width" style=" height: 100%; border: 0;">{{peer.configuration || "Error fetching configuration..."}}</textarea>
+
+  </div>
+  <div
+    fxFlex="20"
+    fxFlex.lt-lg="100"
+  >
+    <qrcode *ngIf="peer.configuration" [qrdata]="peer.configuration" width="100%" [errorCorrectionLevel]="'M'"></qrcode>
+  </div>
+
+</div>

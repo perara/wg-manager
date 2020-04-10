@@ -4,7 +4,8 @@ import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { environment } from '../../../environments/environment';
-import {User} from "../../interfaces/user";
+import { User } from '../../interfaces/user';
+import { Router } from '@angular/router';
 
 const tokenName = 'token';
 
@@ -14,20 +15,19 @@ const tokenName = 'token';
 export class AuthService {
 
   public user: User = null;
-  private url = `${environment.apiBaseUrl}/api`;
+  private url = `${environment.apiBaseUrl}/api/v1`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   public get isLoggedIn(): boolean {
-    return !!this.user?.access_token
+    return !!this.user?.access_token;
   }
 
   public login(data): Observable<any> {
     // Create form
-    let formData: FormData = new FormData();
+    const formData: FormData = new FormData();
     formData.append('username', data.username);
     formData.append('password', data.password);
-
 
     return this.http.post(`${this.url}/login`, formData)
       .pipe(
@@ -36,18 +36,18 @@ export class AuthService {
         }));
   }
 
-  public edit(formData: any){
+  public edit(formData: any) {
     return this.http.post(`${this.url}/user/edit`, formData)
       .pipe(map((res: any) => {
         this._handleUser(res);
       }));
   }
 
-  _handleUser(res: any){
+  _handleUser(res: any) {
     const user: any = res.user;
     user.access_token = res.access_token;
     user.token_type = res.token_type;
-    localStorage.setItem("session", JSON.stringify(user));
+    localStorage.setItem('session', JSON.stringify(user));
     this.init();
   }
 
@@ -55,12 +55,12 @@ export class AuthService {
     return this.http.get(`${this.url}/logout`)
       .pipe(map((data) => {
         this.clearData();
+        this.router.navigate(['/page/user/login']);
         return of(false);
       }));
   }
 
-
-  public clearData(){
+  public clearData() {
     this.user = null;
     localStorage.clear();
 
@@ -69,7 +69,6 @@ export class AuthService {
   public get authToken(): string {
     return localStorage.getItem(tokenName);
   }
-
 
   public init() {
     this.user = JSON.parse(localStorage.getItem('session'));

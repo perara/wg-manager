@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outDir": "../out-tsc/app",
     "baseUrl": "./",
-    "types": ["d3", "nvd3", "material-design-lite"]
+    "types": []
   },
   "files": [
     "main.ts",

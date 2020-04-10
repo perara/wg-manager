@@ -1,9 +1,15 @@
 import logging
 import subprocess
+import tempfile
+
+import typing
+
 import const
 import schemas
 import os
 import re
+
+import util
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -20,6 +26,21 @@ class WGPermissionsError(Exception):
     pass
 
 
+class TempServerFile():
+    def __init__(self, server: schemas.WGServer):
+        self.server = server
+        self.td = tempfile.TemporaryDirectory(prefix="wg_man_")
+        self.server_file = os.path.join(self.td.name, f"{server.interface}.conf")
+
+    def __enter__(self):
+        with open(self.server_file, "w+") as f:
+            f.write(self.server.configuration)
+        return self.server_file
+
+    def __exit__(self, type, value, traceback):
+        self.td.cleanup()
+
+
 def _run_wg(server: schemas.WGServer, command):
     try:
         output = subprocess.check_output(const.CMD_WG_COMMAND + command, stderr=subprocess.STDOUT)
@@ -28,19 +49,25 @@ def _run_wg(server: schemas.WGServer, command):
         if b'Operation not permitted' in e.output:
             raise WGPermissionsError("The user has insufficientt permissions for interface %s" % server.interface)
 
+
 def is_installed():
     output = subprocess.check_output(const.CMD_WG_COMMAND)
     return output == b'' or b'interface' in output
 
 
-def generate_keys():
-
+def generate_keys() -> typing.Dict[str, str]:
     private_key = subprocess.check_output(const.CMD_WG_COMMAND + ["genkey"])
     public_key = subprocess.check_output(
         const.CMD_WG_COMMAND + ["pubkey"],
         input=private_key
     )
-    return private_key.decode("utf-8").strip(), public_key.decode("utf-8").strip()
+
+    private_key = private_key.decode("utf-8").strip()
+    public_key = public_key.decode("utf-8").strip()
+    return dict(
+        private_key=private_key,
+        public_key=public_key
+    )
 
 
 def generate_psk():
@@ -48,32 +75,28 @@ def generate_psk():
 
 
 def start_interface(server: schemas.WGServer):
-    server_file = os.path.join(const.SERVER_DIR(server.interface), server.interface + ".conf")
-
-    try:
-        print(*const.CMD_WG_QUICK, "up", server_file)
-        output = subprocess.check_output(const.CMD_WG_QUICK + ["up", server_file], stderr=subprocess.STDOUT)
-        return output
-    except Exception as e:
-
-        if b'already exists' in e.output:
-            raise WGAlreadyStartedError("The wireguard device %s is already started." % server.interface)
+    with TempServerFile(server) as server_file:
+        try:
+            #print(*const.CMD_WG_QUICK, "up", server_file)
+            output = subprocess.check_output(const.CMD_WG_QUICK + ["up", server_file], stderr=subprocess.STDOUT)
+            return output
+        except Exception as e:
+            if b'already exists' in e.output:
+                raise WGAlreadyStartedError("The wireguard device %s is already started." % server.interface)
 
 
 def stop_interface(server: schemas.WGServer):
-    server_file = os.path.join(const.SERVER_DIR(server.interface), server.interface + ".conf")
+    with TempServerFile(server) as server_file:
+        try:
+            output = subprocess.check_output(const.CMD_WG_QUICK + ["down", server_file], stderr=subprocess.STDOUT)
+            return output
+        except Exception as e:
 
-    try:
-        output = subprocess.check_output(const.CMD_WG_QUICK + ["down", server_file], stderr=subprocess.STDOUT)
-        return output
-    except Exception as e:
-
-        if b'is not a WireGuard interface' in e.output:
-            raise WGAlreadyStoppedError("The wireguard device %s is already stopped." % server.interface)
+            if b'is not a WireGuard interface' in e.output:
+                raise WGAlreadyStoppedError("The wireguard device %s is already stopped." % server.interface)
 
 
 def restart_interface(server: schemas.WGServer):
-
     try:
         stop_interface(server)
     except WGAlreadyStoppedError:
@@ -82,7 +105,6 @@ def restart_interface(server: schemas.WGServer):
 
 
 def is_running(server: schemas.WGServer):
-
     try:
         output = _run_wg(server, ["show", server.interface])
         if output is None:
@@ -158,3 +180,29 @@ def get_stats(server: schemas.WGServer):
     except Exception as e:
         _LOGGER.exception(e)
         return []
+
+
+def move_server_dir(interface, interface1):
+    old_server_dir = const.SERVER_DIR(interface)
+    old_server_file = const.SERVER_FILE(interface)
+    new_server_dir = const.SERVER_DIR(interface1)
+    new_server_file = old_server_file.replace(f"{interface}.conf", f"{interface1}.conf")
+
+    os.rename(old_server_file, new_server_file)
+    os.rename(old_server_dir, new_server_dir)
+
+
+def generate_config(obj: typing.Union[typing.Dict[schemas.WGPeer, schemas.WGServer], schemas.WGServer]):
+    if isinstance(obj, dict) and "server" in obj and "peer" in obj:
+        template = "peer.j2"
+    elif isinstance(obj, schemas.WGServer):
+        template = "server.j2"
+    else:
+        raise ValueError("Incorrect input type. Should be WGPeer or WGServer")
+
+    result = util.jinja_env.get_template(template).render(
+        data=obj
+    )
+
+    return result
+

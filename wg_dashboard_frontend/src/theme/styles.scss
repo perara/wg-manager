@@ -1,13 +1,80 @@
 @import "./fonts/font-roboto.css";
 $material-icons-font-path: '~material-icons/iconfont/';
 @import '~material-icons/iconfont/material-icons.scss';
-@import "~material-design-lite/material.css";
 
+
+@import '~@angular/material/theming';
+
+@include mat-core();
+
+// Add your desired themes to this map.
+$themes-map: (
+  indigo-pink: (
+    primary-base: $mat-indigo,
+    accent-base: $mat-pink,
+  ),
+
+  deeppurple-amber: (
+    primary-base: $mat-deep-purple,
+    accent-base: $mat-amber,
+  ),
+
+  pink-bluegrey: (
+    primary-base: $mat-pink,
+    accent-base: $mat-blue-gray,
+  ),
+
+  purple-green: (
+    primary-base: $mat-purple,
+    accent-base: $mat-green,
+  ),
+);
+
+
+// Import the module and do the job:
+@import '~angular-material-dynamic-themes/themes-core';
+@include make-stylesheets($themes-map);
 
 //html, body { height: 100%; }
 //body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
-html, body {
+html,
+body {
   box-sizing: border-box;
   height: 100%;
   margin: 0;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.app-material-icon-valign {
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.mat-card-header-text{
+  width: 100% !important;
+}
+
+.button-row button,
+.button-row a{
+  margin-right: 8px;
+}
+
+.card-container-right{
+  display: inline;
+  float: right;
+}
+
+.card-container-left{
+  display: inline !important;
+}
+
+.green{
+  color:green;;
+
+}
+.red{
+  color:red;
 }

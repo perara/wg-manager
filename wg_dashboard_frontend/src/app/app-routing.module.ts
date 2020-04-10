@@ -1,10 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import {LayoutModule} from "./layout/layout.module";
+import { LayoutModule } from './layout/layout.module';
 
-import {ErrorComponent} from "./page/error";
-
-
+import { ErrorComponent } from './page/error';
 
 @NgModule({
   imports: [
@@ -12,7 +10,6 @@ import {ErrorComponent} from "./page/error";
       [
         { path: '', redirectTo: 'app/dashboard', pathMatch: 'full' },
         { path: 'page',  loadChildren: () => import('./page/page.module').then(m => m.PageModule) },
-
 
         /*{ path: 'app', component: LayoutComponent, children:
             [
@@ -29,7 +26,7 @@ import {ErrorComponent} from "./page/error";
               { path: 'edit', component: EditComponent, pathMatch: 'full', canActivate: [AuthGuard]},
             ]
         },*/
-        { path: '**', redirectTo: '/page/404'},
+        { path: '**', redirectTo: '/page/404' },
 
       ],
       { useHash: true },
@@ -39,3 +36,4 @@ import {ErrorComponent} from "./page/error";
   exports: [RouterModule],
 })
 export class AppRoutingModule {}
+

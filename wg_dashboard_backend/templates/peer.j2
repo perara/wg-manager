@@ -1,12 +1,12 @@
 [Interface]
-Address = {{ data.address.replace("/32", "/24") }}
-PrivateKey = {{ data.private_key }}
-DNS = {{ data.dns }}
+Address = {{ data.peer.address.replace("/32", "/24") }}
+PrivateKey = {{ data.peer.private_key }}
+DNS = {{ data.peer.dns }}
 
 [Peer]
-PublicKey = {{ data.server_ref.public_key }}
-AllowedIPs = {{ data.allowed_ips }}
-Endpoint = {{ data.server_ref.endpoint }}:{{ data.server_ref.listen_port }}
-{% if data.preshared_key %}
-    PresharedKey = {{ data.server_ref.preshared_key }}
+PublicKey = {{ data.server.public_key }}
+AllowedIPs = {{ data.peer.allowed_ips }}
+Endpoint = {{ data.server.endpoint }}:{{ data.server.listen_port }}
+{% if data.server.shared_key %}
+PresharedKey = {{ data.server.shared_key }}
 {% endif %}

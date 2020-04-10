@@ -1,36 +1,51 @@
-<ng-template #content let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title">{{title || "No 'title' defined" }}</h4>
 
 
-    <button type="button" class="close" aria-label="Close" (click)="modal.close('cancel')">
-      <span aria-hidden="true">&times;</span>
-    </button>
+<div *ngIf="shown"    fxLayout="row"
+     fxLayout.xs="column"
+     fxFlexFill
+     fxLayoutAlign="center center">
+  <mat-card  style="position: absolute; z-index: 10; left: 50%; top: 0; width: 50%;">
+    <mat-card-header>
 
-  </div>
-  <div class="modal-body">
-      <textarea *ngIf="area" readonly class="
-                  mdl-textfield--full-width
-                  mdl-layout__header" style="min-height: 250px; height: 100%;">{{text || "No Text Defined" }}</textarea>
+      <mat-card-title class="card-container-left">
+        {{title || "No 'title' defined" }}
+      </mat-card-title>
+      <mat-card-title class="card-container-right">
+
+        <mat-icon matTooltip="Close" (click)="cancel($event)"
+                  class="app-material-icon-valign" style="cursor: pointer"
+        >close</mat-icon>
+
+
+      </mat-card-title>
+
+    </mat-card-header>
+
+    <mat-card-content>
+
+      <textarea *ngIf="area" readonly class="full-width" style="min-height: 250px; height: 100%;">{{text || "No Text Defined" }}</textarea>
       <div class="form-group" *ngIf="!area">{{text || "No Text Defined" }}</div>
-    <div style="text-align: center;" *ngIf="qrCode">
-      <qrcode [qrdata]="text" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
-    </div>
+      <div style="text-align: center;" *ngIf="qrCode">
+        <hr>
+        <qrcode [qrdata]="text" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
+      </div>
 
+    </mat-card-content>
 
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-dark" (click)="modal.close('confirm')">Confirm</button>
-    <button type="button" class="btn btn-dark" (click)="modal.close('cancel')">Cancel</button>
-  </div>
-</ng-template>
+    <mat-card-actions align="end">
+      <div class="button-row">
+        <button mat-flat-button color="primary" type="button" (click)="confirm($event)">Confirm</button>
+        <button mat-flat-button color="warn" type="button" (click)="cancel($event)">Cancel</button>
+      </div>
+    </mat-card-actions>
 
-
+  </mat-card>
+</div>
 
 <button
-  class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect"
-  data-placement="bottom"
-  [title]="hover"
-  (click)="open($event, content)">
+  mat-icon-button
+  color="primary"
+  [matTooltip]="hover"
+  (click)="open($event)">
   <i class="material-icons">{{icon}}</i>
 </button>

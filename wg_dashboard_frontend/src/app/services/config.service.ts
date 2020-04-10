@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
-import {HttpErrorResponse} from "@angular/common/http";
-import {throwError} from "rxjs";
+import { HttpErrorResponse } from '@angular/common/http';
+import { throwError } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ConfigService {
 
-  public applicationName = "Wireguard Manager";
+  public applicationName = 'Wireguard Manager';
 
   constructor() { }
 
@@ -25,5 +25,5 @@ export class ConfigService {
     // return an observable with a user-facing error message
     return throwError(
       'Something bad happened; please try again later.');
-  };
+  }
 }

@@ -1,4 +1,4 @@
-import {Peer} from "./peer";
+import { Peer } from './peer';
 
 export interface Server {
   address: string;
@@ -11,5 +11,6 @@ export interface Server {
   is_running: boolean;
   post_up: string;
   post_down: string;
-  peers: Array<Peer>
+  configuration: string;
+  peers: Peer[];
 }

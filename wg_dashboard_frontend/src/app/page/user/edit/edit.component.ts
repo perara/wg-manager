@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {AuthService} from "@services/*";
-import {Router} from "@angular/router";
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from '@services/*';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-edit',
   templateUrl: './edit.component.html',
-  styleUrls: ['./edit.component.scss']
+  styleUrls: ['./edit.component.scss'],
 })
 export class EditComponent implements OnInit {
 
@@ -31,20 +31,19 @@ export class EditComponent implements OnInit {
   public ngOnInit() {
     this.user = this.authService.user;
 
-
     this.editForm.setValue({
       full_name: this.user.full_name,
-      password: "",
+      password: '',
       email: this.user.email,
-      username: this.user.username
-    })
+      username: this.user.username,
+    });
   }
 
   public edit() {
     if (this.editForm.valid) {
       this.authService.edit(this.editForm.getRawValue())
         .subscribe(res => this.router.navigate(['/app/dashboard']),
-          error => this.error = error.message);
+                   error => this.error = error.message);
     }
   }
 
