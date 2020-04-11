@@ -88,6 +88,11 @@ Use jwilder/nginx-proxy or similar.
 ![Illustration](docs/images/8.png)
 
 # Roadmap
+### Primaries
+- Implement multi-server support (setting up site-2-site servers from the GUI)
+- Extending multi-server support to enable custom access lists (A peer can be assigned to multiple servers, as part of the ACL)
+
+### Other
 * Eventual bugfixes
 * Improve Auth
 * Improve everything...
