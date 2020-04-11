@@ -15,7 +15,9 @@ The interface runs in docker and requires the host to have installed wireguard, 
 * docker
 
 # Installation
-
+1. Enable ip forwarding with `sysctl -w net.ipv4.ip_forward=1`
+1.1. To make the forwarding persistent add `net.ipv4.ip_forward = 1` to `/etc/sysctl.d/99-sysctl.conf`
+2. It is recommended to have a firewall protecting your services
 ## Docker
 ```bash
 docker run -d \
