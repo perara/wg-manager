@@ -18,6 +18,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import {CookieService} from "ngx-cookie-service";
+import {NotifierModule} from "angular-notifier";
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import {CookieService} from "ngx-cookie-service";
     MatSidenavModule,
     MatListModule,
     FlexLayoutModule,
+    NotifierModule
 
   ],
   providers: [

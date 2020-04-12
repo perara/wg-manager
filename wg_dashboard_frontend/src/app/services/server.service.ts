@@ -6,6 +6,7 @@ import { catchError } from 'rxjs/operators';
 import { Server } from '../interfaces/server';
 import { Peer } from '../interfaces/peer';
 import { Observable, Subscribable } from 'rxjs';
+import {NotifierService} from "angular-notifier";
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +18,7 @@ export class ServerService {
   public wgURL = this.base + "wg";
 
 
-  constructor(private config: ConfigService, private http: HttpClient) {
+  constructor(private config: ConfigService, private http: HttpClient, private notify: NotifierService) {
 
   }
 
@@ -27,7 +28,7 @@ export class ServerService {
 
   public serverPerformAction(action: string, item: any): Subscribable<Server> {
     return this.http.post(this.serverURL + '/' + action, item)
-      .pipe(catchError(this.config.handleError.bind(this)));
+      .pipe(catchError(this.config.handleError));
   }
 
   public addPeer(server_interface: any): Subscribable<Peer> {

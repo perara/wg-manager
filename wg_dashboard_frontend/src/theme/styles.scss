@@ -2,7 +2,7 @@
 $material-icons-font-path: '~material-icons/iconfont/';
 @import '~material-icons/iconfont/material-icons.scss';
 
-
+@import "~angular-notifier/styles";
 @import '~@angular/material/theming';
 
 @include mat-core();

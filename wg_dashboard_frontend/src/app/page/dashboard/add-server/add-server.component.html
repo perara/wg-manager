@@ -1,4 +1,20 @@
 <mat-card class="dashboard-card">
+
+  <mat-card-title class="card-container-left">
+    Add WireGuard Server
+  </mat-card-title>
+  <mat-card-title class="card-container-right">
+
+    <input #confInput hidden="true" type="file" multiple onclick="this.value=null" (change)="parseFiles($event)" accept=".conf"/>
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="confInput.click()"
+      matTooltip="Import existing wireguard configuration. You can select both server and peer configuration. The number of imported peers are described near the submit button."
+    >Import Configuration</button>
+
+  </mat-card-title>
+
   <mat-card-content class="dashboard-card-content">
 
     <form [formGroup]="serverForm" class="add-server-form">
@@ -94,14 +110,17 @@
           <ng-container *ngIf="isEdit">Edit Server</ng-container>
         </button>
 
-        <button mat-raised-button color="warn" (click)="isEdit = false; serverForm.reset()">
+        <button mat-raised-button color="warn" (click)="resetForm()">
           Reset
         </button>
+
+        <div *ngIf="this.serverForm.value['peers'] && this.serverForm.value['peers'].length > 0">
+          Importing <b>{{this.serverForm.value['peers'].length}}</b> peers.
+        </div>
 
       </div>
 
     </form>
-
 
 
 
