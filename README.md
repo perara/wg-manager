@@ -12,10 +12,12 @@ The interface runs in docker and requires the host to have installed wireguard, 
 
 # Dependencies
 * wireguard-dkms or Linux kernel >= 5.6
-* docker
+* python 3.6+
 
-# Installation
-
+# Installation (Docker)
+1. Enable ip forwarding with `sysctl -w net.ipv4.ip_forward=1`
+1.1. To make the forwarding persistent add `net.ipv4.ip_forward = 1` to `/etc/sysctl.d/99-sysctl.conf`
+2. It is recommended to have a firewall protecting your services
 ## Docker
 ```bash
 docker run -d \
@@ -49,6 +51,10 @@ perara/wireguard-manager
       ADMIN_USERNAME: admin
       WEB_CONCURRENCY: 1
 ```
+
+# Install (OS)
+- [Installation on Debian/Ubuntu](./docs/install_debian.md)
+
 
 # Environment variables
 | Environment      | Description                                                              | Recommended |
@@ -88,6 +94,11 @@ Use jwilder/nginx-proxy or similar.
 ![Illustration](docs/images/8.png)
 
 # Roadmap
+### Primaries
+- Implement multi-server support (setting up site-2-site servers from the GUI)
+- Extending multi-server support to enable custom access lists (A peer can be assigned to multiple servers, as part of the ACL)
+
+### Other
 * Eventual bugfixes
 * Improve Auth
 * Improve everything...
