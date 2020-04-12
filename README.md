@@ -28,7 +28,7 @@ docker run -d \
 -v wireguard-manager:/config \
 -e PORT="8888" \
 -e ADMIN_USERNAME="admin" \
--e ADMIN_PASSWORD="admin \
+-e ADMIN_PASSWORD="admin" \
 perara/wireguard-manager
 ```
 
