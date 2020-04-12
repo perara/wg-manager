@@ -1,5 +1,5 @@
-# wireguard-manager
-The wireguard-manager provides a easy-to-use graphical interface to setup and manage wireguard server(s).
+# wg-manager
+The wg-manager provides a easy-to-use graphical interface to setup and manage WireGuard server(s).
 The following features is implemented:
 * Create/Delete/Modify Server
 * Create/Delete/Modify Users
@@ -26,7 +26,7 @@ docker run -d \
 -v wireguard-manager:/config \
 -e PORT="8888" \
 -e ADMIN_USERNAME="admin" \
--e ADMIN_PASSWORD="admin \
+-e ADMIN_PASSWORD="admin" \
 perara/wireguard-manager
 ```
 

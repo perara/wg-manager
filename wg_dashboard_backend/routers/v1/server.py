@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from starlette.responses import JSONResponse
 
 import const
+import models
 import schemas
 import middleware
 import db.wireguard
@@ -33,6 +34,7 @@ def add_interface(
 ):
     server.post_up = server.post_up if server.post_up != "" else const.DEFAULT_POST_UP
     server.post_down = server.post_up if server.post_up != "" else const.DEFAULT_POST_DOWN
+    peers = server.peers if server.peers else []
 
     # Public/Private key
     try:
@@ -40,12 +42,30 @@ def add_interface(
         if server.filter_query(sess).count() != 0:
             raise HTTPException(status_code=400, detail="The server interface %s already exists in the database" % server.interface)
 
-        keys = script.wireguard.generate_keys()
-        server.private_key = keys["private_key"]
-        server.public_key = keys["public_key"]
-        server.configuration = script.wireguard.generate_config(server)
+        if not server.private_key:
+            keys = script.wireguard.generate_keys()
+            server.private_key = keys["private_key"]
+            server.public_key = keys["public_key"]
 
+        server.configuration = script.wireguard.generate_config(server)
+        server.peers = []
         server.sync(sess)
+
+        if len(peers) > 0:
+            server.from_db(sess)
+
+            for schemaPeer in peers:
+                schemaPeer.server_id = server.id
+                schemaPeer.configuration = script.wireguard.generate_config(dict(
+                    peer=schemaPeer,
+                    server=server
+                ))
+                dbPeer = models.WGPeer(**schemaPeer.dict())
+                sess.add(dbPeer)
+                sess.commit()
+
+        server.from_db(sess)
+
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
