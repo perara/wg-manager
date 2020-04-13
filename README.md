@@ -53,8 +53,8 @@ perara/wireguard-manager
 ```
 
 # Install (OS)
-- [Installation on Debian/Ubuntu](./docs/install_debian.md)
-
+- [Installation on Debian/Ubuntu](./docs/install_debian.md) (TODO)
+- [Installation on Raspberry PI 4](./docs/install_rpi.md)
 
 # Environment variables
 | Environment      | Description                                                              | Recommended |
@@ -67,8 +67,17 @@ perara/wireguard-manager
 | LOG_LEVEL        | Logging level of gunicorn/python                                         | info        |
 | ADMIN_USERNAME   | Default admin username on database creation                              | admin       |
 | ADMIN_PASSWORD   | Default admin password on database creation                              | admin       |
+
+
 # Usage
 When docker container is started, go to http://localhost:80
+
+### Importing existing configuration
+1. Click the Import configuration button in the right pane
+2. Select all relevant server and client files. There is a few cases here:
+    1. If you only provide a server configuration. Everything will load fine, but you cannot export peer.configurations
+    2. If you provide both client and server configurations. Everything should work ok
+    3. Client should have [Interface] and [Peer] defined. Currently only supporting clients with 1 peer section.
 
 # Reverse Proxy
 Use jwilder/nginx-proxy or similar.
