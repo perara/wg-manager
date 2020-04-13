@@ -34,25 +34,25 @@ perara/wireguard-manager
 
 ## Docker-compose
 ```yaml
-  version: "2"
-  services:
-   wireguard:
-     container_name: wireguard-manager
-     image: perara/wireguard-manager
-     cap_add:
-       - NET_ADMIN
-     ports:
-        - 51800:51900/udp
-        - 8888:8888
-     volumes:
-       - ./ops/wireguard/_data:/config
-     environment:
-       HOST: 0.0.0.0
-       PORT: 8888
-       ADMIN_PASSWORD: admin
-       ADMIN_USERNAME: admin
-       WEB_CONCURRENCY: 1
-     network_mode: host
+version: "2"
+services:
+ wireguard:
+    container_name: wireguard-manager
+    image: perara/wireguard-manager
+    cap_add:
+      - NET_ADMIN
+    ports:
+       - 51800:51900/udp
+       - 8888:8888
+    volumes:
+      - ./ops/wireguard/_data:/config
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8888
+      ADMIN_PASSWORD: admin
+      ADMIN_USERNAME: admin
+      WEB_CONCURRENCY: 1
+    network_mode: host
 ```
 
 # Install (OS)
