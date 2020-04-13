@@ -53,7 +53,7 @@ or [plain docker here](./docs/guides/docker_configuration.md)
 - [Installation on Debian/Ubuntu](./docs/install_debian.md)
 - [Installation on Raspberry PI 4](./docs/install_rpi.md)
 
-### Guides
+# Guides
 - [Importing Existing configuration](./docs/guides/import_existing_server.md)
 - [Reverse Proxy](./docs/guides/reverse_proxy.md)
 
