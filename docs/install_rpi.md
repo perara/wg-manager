@@ -29,6 +29,7 @@ sudo apt install wireguard wireguard-tools -y
 ### 3. Installing node.js
 ```
 curl -sL https://deb.nodesource.com/setup_13.x | sudo bash -
+sudo apt-get install -y nodejs
 ```
 
 ### 3. Installing
