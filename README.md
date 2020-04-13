@@ -1,49 +1,45 @@
 # wg-manager
-The wg-manager provides a easy-to-use graphical interface to setup and manage WireGuard server(s).
-The following features is implemented:
-* Create/Delete/Modify Server
-* Create/Delete/Modify Users
-* QRCode export
-* Text export
-* Start/Stop server
-* User bandwidth usage statistics
+The wg-manager provides an easy-to-use graphical web interface to import, setup, and manage WireGuard server(s).
 
-The interface runs in docker and requires the host to have installed wireguard, either as a dkms module, or by using newer kernels (5.6+)
+The features of wg-manager includes:
+
+**Server**
+* Create/Delete/Modify
+* Start/Stop/Restart server
+* Import existing
+
+**Peer**
+* Create/Delete/Modify
+* Bandwidth usage statistics
+* Export by QRCode, Text
+
+**General**
+* Modify Admin User
 
 # Dependencies
-* wireguard-dkms or Linux kernel >= 5.6
-* python 3.6+
+* Linux >= 5.6 *(Alternatively: wireguard-dkms)*
 
-# Installation (Docker)
+# Common Installation Steps
 1. Enable ip forwarding with `sysctl -w net.ipv4.ip_forward=1`
-1.1. To make the forwarding persistent add `net.ipv4.ip_forward = 1` to `/etc/sysctl.d/99-sysctl.conf`
-2. It is recommended to have a firewall protecting your services
-## Docker
-```bash
-docker run -d \
---cap-add NET_ADMIN \
---name wireguard-manager \
---net host \
--p "51800-51900:51800-51900/udp" \
--v wireguard-manager:/config \
--e PORT="8888" \
--e ADMIN_USERNAME="admin" \
--e ADMIN_PASSWORD="admin" \
-perara/wireguard-manager
-```
+    * To make the forwarding persistent add `net.ipv4.ip_forward = 1` to `/etc/sysctl.d/99-sysctl.conf`
+2. It is recommended to have a firewall protecting your servers
 
-## Docker-compose
+## Notes
+* A few people has experienced issues with running the dockerized method using bridged networking. To fix this, you can use `network_mode: host`. Note that you can no longer reverse-proxy the web interface from reverse proxies such as [jwilder/nginx-proxy](https://hub.docker.com/r/jwilder/nginx-proxy/).
+
+## Method #1: Docker-compose
 ```yaml
   wireguard:
     container_name: wireguard-manager
     image: perara/wireguard-manager
     cap_add:
       - NET_ADMIN
+    #network_mode: host # Alternatively
     ports:
        - 51800:51900/udp
        - 8888:8888
     volumes:
-      - ./ops/wireguard/_data:/config
+      - ./wg-manager:/config
     environment:
       HOST: 0.0.0.0
       PORT: 8888
@@ -51,10 +47,19 @@ perara/wireguard-manager
       ADMIN_USERNAME: admin
       WEB_CONCURRENCY: 1
 ```
+or [plain docker here](./docs/guides/docker_configuration.md)
 
-# Install (OS)
-- [Installation on Debian/Ubuntu](./docs/install_debian.md) (TODO)
+# Method #2: Bare Metal
+- [Installation on Debian/Ubuntu](./docs/install_debian.md)
 - [Installation on Raspberry PI 4](./docs/install_rpi.md)
+
+### Guides
+- [Importing Existing configuration](./docs/guides/import_existing_server.md)
+- [Reverse Proxy](./docs/guides/reverse_proxy.md)
+
+# Usage
+When docker container/server has started, go to http://localhost:8888
+
 
 # Environment variables
 | Environment      | Description                                                              | Recommended |
@@ -67,21 +72,6 @@ perara/wireguard-manager
 | LOG_LEVEL        | Logging level of gunicorn/python                                         | info        |
 | ADMIN_USERNAME   | Default admin username on database creation                              | admin       |
 | ADMIN_PASSWORD   | Default admin password on database creation                              | admin       |
-
-
-# Usage
-When docker container is started, go to http://localhost:80
-
-### Importing existing configuration
-1. Click the Import configuration button in the right pane
-2. Select all relevant server and client files. There is a few cases here:
-    1. If you only provide a server configuration. Everything will load fine, but you cannot export peer.configurations
-    2. If you provide both client and server configurations. Everything should work ok
-    3. Client should have [Interface] and [Peer] defined. Currently only supporting clients with 1 peer section.
-
-# Reverse Proxy
-Use jwilder/nginx-proxy or similar.
-
 
 # Showcase
 ![Illustration](docs/images/0.png)
