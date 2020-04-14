@@ -50,8 +50,7 @@ The features of wg-manager includes:
 or [plain docker here](./docs/guides/docker_configuration.md)
 
 # Method #2: Bare Metal
-- [Installation on Debian/Ubuntu](./docs/install_debian.md)
-- [Installation on Raspberry PI 4](./docs/install_rpi.md)
+- [Installation on Debian/Ubuntu/RPI4](./docs/install.md)
 
 # Guides
 - [Importing Existing configuration](./docs/guides/import_existing_server.md)
