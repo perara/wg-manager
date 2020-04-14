@@ -1,10 +1,10 @@
-## How to contribute to wireguard-manager
+## How to contribute to wg-manager
 
 #### **Did you find a bug?**
 
-* **Ensure the bug was not already reported** by searching on GitHub under [Issues](https://github.com/perara/wireguard-manager/issues).
+* **Ensure the bug was not already reported** by searching on GitHub under [Issues](https://github.com/perara/wg-manager/issues).
 
-* If you're unable to find an open issue addressing the problem, [open a new one](https://github.com/perara/wireguard-manager/issues/new). Be sure to include a **title and clear description**, as much relevant information as possible, and a **code sample** demonstrating the expected behavior that is not occurring.
+* If you're unable to find an open issue addressing the problem, [open a new one](https://github.com/perara/wg-manager/issues/new). Be sure to include a **title and clear description**, as much relevant information as possible, and a **code sample** demonstrating the expected behavior that is not occurring.
 
 * If possible, use the [bug report template](.github/ISSUE_TEMPLATE.md) to create the issue.
 
@@ -16,7 +16,7 @@
 
 #### **Do you intend to add a new feature or change an existing one?**
 
-* Send a [GitHub Pull Request](https://github.com/perara/wireguard-manager/pull/new) with a clear list of what you've done (read more about [pull requests](http://help.github.com/pull-requests/)). Please follow our coding conventions (below) and make sure all of your commits are atomic (one feature per commit).
+* Send a [GitHub Pull Request](https://github.com/perara/wg-manager/pull/new) with a clear list of what you've done (read more about [pull requests](http://help.github.com/pull-requests/)). Please follow our coding conventions (below) and make sure all of your commits are atomic (one feature per commit).
 
 * We use [Karma commit message convention](http://karma-runner.github.io/0.13/dev/git-commit-msg.html). Please follow it.
 
@@ -24,7 +24,7 @@
 
 #### **Do you have questions about the source code?**
 
-* Ask any question about how to use wireguard-manager in the [Issues](https://github.com/perara/wireguard-manager/issues).
+* Ask any question about how to use wg-manager in the [Issues](https://github.com/perara/wg-manager/issues).
 
 Thanks! :heart: :heart: :heart:
 

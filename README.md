@@ -30,8 +30,8 @@ The features of wg-manager includes:
 ## Method #1: Docker-compose
 ```yaml
   wireguard:
-    container_name: wireguard-manager
-    image: perara/wireguard-manager
+    container_name: wg-manager
+    image: perara/wg-manager
     cap_add:
       - NET_ADMIN
     #network_mode: host # Alternatively
