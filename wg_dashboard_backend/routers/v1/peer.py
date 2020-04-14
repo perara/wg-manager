@@ -23,7 +23,16 @@ def add_peer(
 
     address_space = set(ipaddress.ip_network(server.address, strict=False).hosts())
     occupied_space = set()
+
+    # Try add server IP to list.
+    try:
+        occupied_space.add(ipaddress.ip_address(server.address.split("/")[0]))
+    except ValueError:
+        pass
+
     for p in server.peers:
+
+        # Try add peer ip to list.
         try:
             occupied_space.add(ipaddress.ip_address(p.address.split("/")[0]))
         except ValueError as e:
