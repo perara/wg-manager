@@ -1,12 +1,14 @@
 import logging
 import os
+
+import typing
 from sqlalchemy_utils import database_exists
 from starlette.middleware.base import BaseHTTPMiddleware
 
 import middleware
 from database import engine, SessionLocal
 from routers.v1 import user, server, peer, wg
-
+import script.wireguard
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 if not logger.hasHandlers():
@@ -27,10 +29,13 @@ import models
 app = FastAPI()
 app.add_middleware(BaseHTTPMiddleware, dispatch=middleware.db_session_middleware)
 
+_db: Session = SessionLocal()
+
+# Ensure database existence
 if not database_exists(engine.url):
     models.Base.metadata.create_all(engine)
     # Create default user
-    _db: Session = SessionLocal()
+
     _db.add(models.User(
         username=os.getenv("ADMIN_USERNAME", "admin"),
         password=middleware.get_password_hash(os.getenv("ADMIN_PASSWORD", "admin")),
@@ -38,8 +43,18 @@ if not database_exists(engine.url):
         role="admin",
         email=""
     ))
-    _db.commit()
-    _db.close()
+_db.commit()
+
+servers: typing.List[models.WGServer] = _db.query(models.WGServer).all()
+for s in servers:
+    try:
+        last_state = s.is_running
+        if script.wireguard.is_installed() and last_state and not script.wireguard.is_running(s):
+            script.wireguard.start_interface(s)
+    except Exception as e:
+        print(e)
+
+_db.close()
 
 
 app.include_router(
@@ -86,12 +101,10 @@ def root():
 app.mount("/", StaticFiles(directory=pkg_resources.resource_filename(__name__, 'build')), name="static")
 
 
-
-
-
 @app.on_event("startup")
 async def startup():
     pass
+
 
 @app.on_event("shutdown")
 async def shutdown():
