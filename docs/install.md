@@ -64,3 +64,10 @@ You should now see the following
 #INFO:     Application startup complete.
 #INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit) 
 ``` 
+
+## 6. Default routing not working?
+Try these.
+
+PostUp `iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE; ip6tables -A FORWARD -i %i -j ACCEPT; ip6tables -t nat -A POSTROUTING -o eth0 -j MASQUERADE`
+
+PostDown `iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE; ip6tables -D FORWARD -i %i -j ACCEPT; ip6tables -t nat -D POSTROUTING -o eth0 -j MASQUERADE`
