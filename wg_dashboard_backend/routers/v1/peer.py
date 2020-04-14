@@ -54,7 +54,7 @@ def add_peer(
     # Set unnamed
     peer.name = "Unnamed"
 
-    peer.dns = server.endpoint
+    peer.dns = server.dns
 
     peer.configuration = script.wireguard.generate_config(dict(
         peer=peer,

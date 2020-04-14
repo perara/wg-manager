@@ -27,6 +27,7 @@ class WGServer(Base):
     public_key = Column(sqlalchemy.String)
     shared_key = Column(sqlalchemy.String)
     endpoint = Column(sqlalchemy.String)
+    dns = Column(sqlalchemy.String)
 
     post_up = Column(sqlalchemy.String)
     post_down = Column(sqlalchemy.String)

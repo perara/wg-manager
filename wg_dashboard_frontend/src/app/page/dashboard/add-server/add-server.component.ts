@@ -44,6 +44,7 @@ export class AddServerComponent implements OnInit {
       interface: new FormControl('', [Validators.required, Validators.minLength(3)]),
       listen_port: new FormControl('', [Validators.required, NumberValidator.stringIsNumber]),
       endpoint: new FormControl('', Validators.required),
+      dns: new FormControl(''),
       private_key: new FormControl('' ),
       public_key: new FormControl('' ),
       shared_key: new FormControl('' ),
