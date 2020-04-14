@@ -99,6 +99,10 @@ def edit_peer(
         peer=peer,
         server=server
     ))
-    peer.sync(sess)
+    sess.query(models.WGPeer)\
+        .filter_by(id=peer.id)\
+        .update(peer.dict(exclude={"id"}))
+
+    sess.commit()
 
     return peer

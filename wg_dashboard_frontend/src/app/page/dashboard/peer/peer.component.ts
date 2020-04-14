@@ -38,6 +38,7 @@ export class PeerComponent implements OnInit {
   edit() {
     if (this.peer._edit) {
 
+
       // Submit the edit (True -> False)
       const idx = this.server.peers.indexOf(this.peer);
       this.serverAPI.editPeer(this.peer).subscribe((newPeer) => {
