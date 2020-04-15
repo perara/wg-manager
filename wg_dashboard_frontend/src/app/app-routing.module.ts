@@ -8,7 +8,7 @@ import { ErrorComponent } from './page/error';
   imports: [
     RouterModule.forRoot(
       [
-        { path: '', redirectTo: 'app/dashboard', pathMatch: 'full' },
+        { path: '', redirectTo: 'page/dashboard', pathMatch: 'full' },
         { path: 'page',  loadChildren: () => import('./page/page.module').then(m => m.PageModule) },
 
         /*{ path: 'app', component: LayoutComponent, children:

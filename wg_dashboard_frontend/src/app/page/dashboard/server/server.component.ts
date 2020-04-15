@@ -3,6 +3,8 @@ import { Server } from '../../../interfaces/server';
 import { ServerService } from '../../../services/server.service';
 import { DataService } from '../../../services/data.service';
 import { Peer } from '../../../interfaces/peer';
+import * as JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-server',
@@ -69,7 +71,25 @@ export class ServerComponent implements OnInit {
     this.selectedPeer = peer;
     this.editPeerEmitter.emit({ type: 'open', peer });
   }
+
   pInt(string: string) {
     return parseInt(string);
+  }
+
+  downloadPeerConfig(peer: Peer){
+    const blob = new Blob([peer.configuration], {type: "text/plain;charset=utf-8"});
+    saveAs(blob, `${peer.name}_${peer.address}.conf`);
+  }
+
+  downloadServerConfig(){
+    const zip = new JSZip();
+    zip.file(`${this.server.interface}.conf`, this.server.configuration)
+    this.server.peers.forEach( peer => {
+      zip.file(`clients/${peer.name}_${peer.address}.conf`, peer.configuration)
+    })
+
+    zip.generateAsync({type:"blob"}).then((content) => {
+      saveAs(content, `${this.server.interface}_${this.server.address}.zip`);
+    });
   }
 }

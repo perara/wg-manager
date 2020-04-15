@@ -15,6 +15,14 @@
     <mat-card-title class="card-container-right">
 
       <app-modal-confirm
+        [noConfirm]="true"
+        (onConfirm)="downloadServerConfig()"
+        area="true"
+        icon="get_app"
+        hover="Download config zip for {{server.interface}}">
+      </app-modal-confirm>
+
+      <app-modal-confirm
         [qrCode]="true"
         [noConfirm]="false"
         area="true"
@@ -106,6 +114,15 @@
               <td>{{peer._stats?.tx || '0'}}/{{peer._stats?.rx || '0'}}</td>
               <td> {{peer._stats?.handshake || 'N/A'}}</td>
               <td>
+
+                <!-- Download Button -->
+                <app-modal-confirm
+                  [noConfirm]="true"
+                  (onConfirm)="downloadPeerConfig(peer); $event.stopPropagation();"
+                  icon="get_app"
+                  hover="Download configuration for {{peer.name}}">
+                </app-modal-confirm>
+
 
                 <!-- Edit buttons -->
                 <app-modal-confirm
