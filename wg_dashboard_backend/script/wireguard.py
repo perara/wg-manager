@@ -160,7 +160,7 @@ def get_stats(server: schemas.WGServer):
                     rx=None,
                     tx=None
                 ))
-            elif len(lines) == 5:
+            elif len(lines) == 5 or len(lines) == 6:
                 public_key = lines[0]
                 client_endpoint, allowed_ips, handshake, rx_tx = lines[-4:]  # [1] is sometimes psk
 
