@@ -47,7 +47,6 @@ export class AddServerComponent implements OnInit {
       dns: new FormControl(''),
       private_key: new FormControl('' ),
       public_key: new FormControl('' ),
-      shared_key: new FormControl('' ),
       post_up: new FormControl(''),
       post_down: new FormControl(''),
 
@@ -216,13 +215,7 @@ export class AddServerComponent implements OnInit {
     });
   }
 
-  getPSK() {
-    this.serverAPI.getPSK().subscribe((psk: any) => {
-      this.serverForm.patchValue({
-        shared_key: psk.psk,
-      });
-    });
-  }
+
 
   resetForm() {
     this.isEdit = false;

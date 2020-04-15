@@ -3,6 +3,7 @@ export interface Peer {
   address: string;
   public_key: string;
   private_key: string;
+  shared_key: string;
   dns: string;
   allowed_ips: string;
   name: string;

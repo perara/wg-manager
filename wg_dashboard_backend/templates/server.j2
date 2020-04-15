@@ -10,8 +10,8 @@ PostDown = {{ data.post_down }}
 [Peer]
 # Client Name: {{ peer.name }}
 PublicKey = {{ peer.public_key }}
-{%- if peer.preshared_key -%}
-PresharedKey = {{ peer.preshared_key }}
-{% endif %}
+{%- if peer.shared_key %}
+PresharedKey = {{ peer.shared_key }}
+{%- endif %}
 AllowedIPs = {{ peer.address }}
 {% endfor %}

@@ -41,9 +41,10 @@ export class PeerComponent implements OnInit {
 
       // Submit the edit (True -> False)
       const idx = this.server.peers.indexOf(this.peer);
-      this.serverAPI.editPeer(this.peer).subscribe((newPeer) => {
-        Object.keys(newPeer).forEach(k => {
-          this.server.peers[idx][k] = newPeer[k];
+      this.serverAPI.editPeer(this.peer).subscribe((data) => {
+        this.server.configuration = data.server_configuration;
+        Object.keys(data.peer).forEach(k => {
+          this.server.peers[idx][k] = data.peer[k];
         });
       });
 
@@ -65,7 +66,10 @@ export class PeerComponent implements OnInit {
     });
   }
 
-
-
+  getPSK() {
+    this.serverAPI.getPSK().subscribe((psk: any) => {
+      this.peer.shared_key = psk.psk;
+    });
+  }
 
 }

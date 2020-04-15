@@ -116,6 +116,7 @@ class WGPeer(GenericModel):
     address: str = None
     private_key: str = None
     public_key: str = None
+    shared_key: str = None
     server_id: str
     dns: str = None
     allowed_ips: str = None
@@ -148,7 +149,6 @@ class WGServer(GenericModel):
     endpoint: str = None
     private_key: str = None
     public_key: str = None
-    shared_key: str = None
     is_running: bool = None
     configuration: str = None
     post_up: str = None

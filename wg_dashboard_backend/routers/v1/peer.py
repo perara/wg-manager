@@ -87,22 +87,32 @@ def delete_peer(
     return peer
 
 
-@router.post("/edit", response_model=schemas.WGPeer)
+@router.post("/edit")
 def edit_peer(
         peer: schemas.WGPeer,
         sess: Session = Depends(middleware.get_db)
 ):
-    server = schemas.WGServer(interface="")\
-            .from_orm(sess.query(models.WGServer).filter_by(id=peer.server_id).one())
+    # Retrieve server from db
+    server: models.WGServer = db.wireguard.get_server_by_id(sess, peer.server_id)
 
+    # Generate peer configuration
     peer.configuration = script.wireguard.generate_config(dict(
         peer=peer,
         server=server
     ))
+
+    # Update database record for Peer
     sess.query(models.WGPeer)\
         .filter_by(id=peer.id)\
         .update(peer.dict(exclude={"id"}))
 
+    # Generate server configuration
+    server.configuration = script.wireguard.generate_config(server)
+    sess.add(server)
+
     sess.commit()
 
-    return peer
+    return dict(
+        peer=peer,
+        server_configuration=server.configuration
+    )

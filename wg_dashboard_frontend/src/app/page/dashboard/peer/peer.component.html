@@ -56,6 +56,29 @@
         </mat-form-field>
       </p>
 
+
+      <table class="full-width" cellspacing="0"><tr>
+        <td width="80%">
+          <mat-form-field class="full-width">
+            <mat-label>PreShared-Key</mat-label>
+            <input [disabled]="!peer._edit" name="shared_key" [(ngModel)]="peer.shared_key" matInput>
+          </mat-form-field>
+        </td>
+        <td>
+          <button type="button" [disabled]="!peer._edit" (click)="getPSK()" mat-raised-button color="primary">
+            <i class="material-icons">share</i>
+            Generate PSK
+          </button>
+        </td>
+      </tr></table>
+
+      <p>
+
+      </p>
+
+
+
+
       <button
         [hidden]="!peer._edit"
         [disabled]="!peerForm.valid"

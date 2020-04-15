@@ -74,22 +74,12 @@
         </mat-form-field>
       </p>
 
-      <p>
-        <mat-form-field class="add-server-full-width">
-          <mat-label>Shared-Key</mat-label>
-          <input formControlName="shared_key" matInput>
-        </mat-form-field>
-      </p>
-
       <div class="button-row">
         <button type="button" [disabled]="!isEdit" (click)="getKeyPair()" mat-raised-button color="primary">
           <i class="material-icons">vpn_key</i>
           Generate KeyPair
         </button>
-        <button type="button" [disabled]="!isEdit" (click)="getPSK()" mat-raised-button color="primary">
-          <i class="material-icons">share</i>
-          Generate PSK
-        </button>
+
       </div>
 
       <p><b>Scripts</b></p>

@@ -1,7 +1,7 @@
 import sqlalchemy
+
 from sqlalchemy import Integer, Column
 from sqlalchemy.orm import relationship, backref
-
 from database import Base
 
 
@@ -25,7 +25,6 @@ class WGServer(Base):
     listen_port = Column(sqlalchemy.String, unique=True)
     private_key = Column(sqlalchemy.String)
     public_key = Column(sqlalchemy.String)
-    shared_key = Column(sqlalchemy.String)
     endpoint = Column(sqlalchemy.String)
     dns = Column(sqlalchemy.String)
 
@@ -45,11 +44,10 @@ class WGPeer(Base):
     address = Column(sqlalchemy.String)
     public_key = Column(sqlalchemy.String)
     private_key = Column(sqlalchemy.String)
-    dns = Column(sqlalchemy.String)
+    shared_key = Column(sqlalchemy.Text)
+    dns = Column(sqlalchemy.Text)
     allowed_ips = Column(sqlalchemy.String)
 
     server_id = Column(Integer, sqlalchemy.ForeignKey('server.id', ondelete="CASCADE", onupdate="CASCADE"))
     server = relationship("WGServer", backref=backref("server"))
     configuration = Column(sqlalchemy.Text)
-
-

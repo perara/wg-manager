@@ -35,7 +35,7 @@ export class ServerService {
     return this.http.post(this.peerURL + '/add', server_interface);
   }
 
-  public editPeer(peer: Peer): Subscribable<Peer> {
+  public editPeer(peer: Peer): Subscribable<{ peer: Peer, server_configuration: string }> {
     return this.http.post(this.peerURL + '/edit', peer);
   }
 

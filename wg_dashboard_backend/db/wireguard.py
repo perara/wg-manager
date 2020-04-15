@@ -22,6 +22,10 @@ def start_client(sess: Session, peer: schemas.WGPeer):
     output = subprocess.check_output(const.CMD_WG_QUICK + ["up", client_file], stderr=subprocess.STDOUT)
 
 
+def get_server_by_id(sess: Session, server_id):
+    return sess.query(models.WGServer).filter_by(id=server_id).one()
+
+
 def peer_query_get_by_address(sess: Session, address: str, server: str):
     return sess.query(models.WGPeer) \
         .filter(models.WGPeer.address == address) \
