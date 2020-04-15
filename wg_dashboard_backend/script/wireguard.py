@@ -161,8 +161,8 @@ def get_stats(server: schemas.WGServer):
                     tx=None
                 ))
             elif len(lines) == 5:
-
-                public_key, client_endpoint, allowed_ips, handshake, rx_tx = lines
+                public_key = lines[0]
+                client_endpoint, allowed_ips, handshake, rx_tx = lines[-4:]  # [1] is sometimes psk
 
                 rx = re.match(r"^(.*) received", rx_tx).group(1)
                 tx = re.match(r"^.*, (.*)sent", rx_tx).group(1)
@@ -174,6 +174,7 @@ def get_stats(server: schemas.WGServer):
                     rx=rx,
                     tx=tx
                 ))
+
             else:
                 ValueError("We have not handled peers with line number of %s" % str(len(lines)))
 
