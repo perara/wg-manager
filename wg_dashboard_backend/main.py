@@ -22,7 +22,9 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from starlette.responses import FileResponse
 from fastapi import Depends, FastAPI
-
+from const import DATABASE_URL
+from migrate import DatabaseAlreadyControlledError
+from migrate.versioning.shell import main
 import models
 
 
@@ -33,9 +35,17 @@ _db: Session = SessionLocal()
 
 # Ensure database existence
 if not database_exists(engine.url):
+    # Create database from metadata
     models.Base.metadata.create_all(engine)
-    # Create default user
 
+    # Do migrations
+    try:
+        main(["version_control", DATABASE_URL, "migrations"])
+    except DatabaseAlreadyControlledError:
+        pass
+    main(["upgrade", DATABASE_URL, "migrations"])
+
+    # Create default user
     _db.add(models.User(
         username=os.getenv("ADMIN_USERNAME", "admin"),
         password=middleware.get_password_hash(os.getenv("ADMIN_PASSWORD", "admin")),

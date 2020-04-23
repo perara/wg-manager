@@ -11,12 +11,3 @@ engine = sqlalchemy.create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
-
-from const import DATABASE_URL
-from migrate import DatabaseAlreadyControlledError
-from migrate.versioning.shell import main
-try:
-    main(["version_control", DATABASE_URL, "migrations"])
-except DatabaseAlreadyControlledError:
-    pass
-main(["upgrade", DATABASE_URL, "migrations"])
