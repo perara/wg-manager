@@ -35,13 +35,22 @@ _db: Session = SessionLocal()
 
 # Ensure database existence
 if not database_exists(engine.url):
+    ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
+    if not ADMIN_USERNAME:
+        raise RuntimeError("Database does not exist and no ADMIN_USER is set")
+
+    ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
+
+    if not ADMIN_PASSWORD:
+        raise RuntimeError("Database does not exist and no ADMIN_PASSWORD is set")
+
     # Create database from metadata
     models.Base.metadata.create_all(engine)
 
     # Create default user
     _db.add(models.User(
-        username=os.getenv("ADMIN_USERNAME", "admin"),
-        password=middleware.get_password_hash(os.getenv("ADMIN_PASSWORD", "admin")),
+        username=ADMIN_USERNAME,
+        password=middleware.get_password_hash(ADMIN_PASSWORD),
         full_name="Admin",
         role="admin",
         email=""
