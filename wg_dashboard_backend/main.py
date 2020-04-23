@@ -38,13 +38,6 @@ if not database_exists(engine.url):
     # Create database from metadata
     models.Base.metadata.create_all(engine)
 
-    # Do migrations
-    try:
-        main(["version_control", DATABASE_URL, "migrations"])
-    except DatabaseAlreadyControlledError:
-        pass
-    main(["upgrade", DATABASE_URL, "migrations"])
-
     # Create default user
     _db.add(models.User(
         username=os.getenv("ADMIN_USERNAME", "admin"),
@@ -54,6 +47,15 @@ if not database_exists(engine.url):
         email=""
     ))
 _db.commit()
+
+
+# Do migrations
+try:
+    main(["version_control", DATABASE_URL, "migrations"])
+except DatabaseAlreadyControlledError:
+    pass
+main(["upgrade", DATABASE_URL, "migrations"])
+
 
 servers: typing.List[models.WGServer] = _db.query(models.WGServer).all()
 for s in servers:
