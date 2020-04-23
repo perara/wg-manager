@@ -12,6 +12,9 @@ def upgrade(migrate_engine):
 
 
 def downgrade(migrate_engine):
-    meta = MetaData(bind=migrate_engine)
-    dns = Table('peer', meta, autoload=True)
-    dns.c.email.drop()
+    try:
+        meta = MetaData(bind=migrate_engine)
+        dns = Table('peer', meta, autoload=True)
+        dns.c.email.drop()
+    except:
+        pass

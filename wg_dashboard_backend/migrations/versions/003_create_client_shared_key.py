@@ -13,7 +13,9 @@ def upgrade(migrate_engine):
 
 
 def downgrade(migrate_engine):
-    meta = MetaData(bind=migrate_engine)
-    dns = Table('peer', meta, autoload=True)
-    dns.c.shared_key.drop()
-
+    try:
+        meta = MetaData(bind=migrate_engine)
+        dns = Table('peer', meta, autoload=True)
+        dns.c.shared_key.drop()
+    except:
+        pass
