@@ -21,7 +21,7 @@ def add_peer(
     server = schemas.WGServer(interface=peer_add.server_interface).from_db(sess)
     peer = schemas.WGPeer(server_id=server.id)
 
-    address_space = set(ipaddress.ip_network(server.address, strict=False).hosts())
+    address_space = set(ipaddress.ip_network(f"{server.address}/{server.subnet}", strict=False).hosts())
     occupied_space = set()
 
     # Try add server IP to list.
@@ -41,7 +41,7 @@ def add_peer(
     address_space -= occupied_space
 
     # Select first available address
-    peer.address = str(list(sorted(address_space)).pop(0)) + "/32"
+    peer.address = str(list(sorted(address_space)).pop(0))
 
     # Private public key generation
     keys = script.wireguard.generate_keys()

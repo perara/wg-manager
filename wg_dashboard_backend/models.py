@@ -21,6 +21,7 @@ class WGServer(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     interface = Column(sqlalchemy.String, unique=True, index=True)
+    subnet = Column(sqlalchemy.Integer, nullable=False)
     address = Column(sqlalchemy.String, unique=True)
     listen_port = Column(sqlalchemy.String, unique=True)
     private_key = Column(sqlalchemy.String)

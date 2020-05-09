@@ -29,10 +29,21 @@
         </td>
         <td>
           <mat-form-field class="add-server-full-width">
-          <mat-label>Address Scope</mat-label>
-          <input formControlName="address" matInput placeholder="10.0.200.1/24">
+          <mat-label>Address</mat-label>
+          <input formControlName="address" matInput placeholder="10.0.200.1">
           </mat-form-field>
         </td>
+
+        <td>
+          <mat-form-field matLine class="add-server-full-width">
+            <mat-label>Subnet</mat-label>
+            <select [(ngModel)]='selectedSubnet' matNativeControl formControlName="subnet">
+              <option *ngFor="let subnet of subnets" [value]="subnet">/{{subnet}}</option>
+            </select>
+
+          </mat-form-field>
+        </td>
+
       </tr></table>
 
       <table class="add-server-full-width" cellspacing="0"><tr>

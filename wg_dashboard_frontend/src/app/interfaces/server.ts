@@ -12,5 +12,6 @@ export interface Server {
   post_up: string;
   post_down: string;
   configuration: string;
+  subnet: number;
   peers: Peer[];
 }

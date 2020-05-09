@@ -18,6 +18,7 @@ import { MatTableModule } from '@angular/material/table';
 import { PeerComponent } from './peer/peer.component';
 import { QRCodeModule } from 'angularx-qrcode';
 import {MatTooltipModule} from "@angular/material/tooltip";
+import {MatSelectModule} from "@angular/material/select";
 
 @NgModule({
   declarations: [
@@ -43,6 +44,7 @@ import {MatTooltipModule} from "@angular/material/tooltip";
         FormsModule,
         QRCodeModule,
         MatTooltipModule,
+        MatSelectModule,
 
     ],
 })

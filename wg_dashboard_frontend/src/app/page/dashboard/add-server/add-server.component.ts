@@ -5,10 +5,10 @@ import { NumberValidator } from '../../../validators/number.validator';
 import { Server } from '../../../interfaces/server';
 import { ServerService } from '../../../services/server.service';
 import { DataService } from '../../../services/data.service';
-import Parser, {Property, Section, Sections} from "@jedmao/ini-parser";
+import Parser, {Section} from "@jedmao/ini-parser";
 import {Peer} from "../../../interfaces/peer";
-import {forkJoin, from, Observable, of} from "rxjs";
-import {concatAll, concatMap, filter, map, mergeAll, mergeMap, switchMap} from "rxjs/operators";
+import {forkJoin, from} from "rxjs";
+import {map, mergeMap} from "rxjs/operators";
 import {NotifierService} from "angular-notifier";
 @Component({
   selector: 'app-add-server',
@@ -34,13 +34,17 @@ export class AddServerComponent implements OnInit {
     "DNS": "dns"
   }
 
+  subnets = [];
+  selectedSubnet = 24;
+
   serverForm: FormGroup = null;
   isEdit = false;
   editServer: Server = null;
 
   initForm(){
     this.serverForm = new FormGroup({
-      address: new FormControl('', [IPValidator.isIPAddress]),
+      address: new FormControl('', [Validators.required, IPValidator.isIPAddress]),
+      subnet: new FormControl('', [Validators.required, Validators.min(1), Validators.max(32)]),
       interface: new FormControl('', [Validators.required, Validators.minLength(3)]),
       listen_port: new FormControl('', [Validators.required, NumberValidator.stringIsNumber]),
       endpoint: new FormControl('', Validators.required),
@@ -62,6 +66,7 @@ export class AddServerComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.subnets = Array(32).fill(1).map((x,i)=>i+1);
     this.initForm();
 
     this.comm.on('server-edit').subscribe((data: Server) => {
@@ -140,11 +145,14 @@ export class AddServerComponent implements OnInit {
       return false;
     }
 
+    iFace.nodes["subnet"] = iFace.nodes["address"].split("/")[1];
+    iFace.nodes["address"] = iFace.nodes["address"].split("/")[0];
+
     iFace.nodes["peers"] = sPeers
       .map( x => x.nodes)
       .map( x => {
       x.server_id = -1;
-      x.address = x.allowed_ips;  // Allowed_ips in server is the address of the peer (Seen from server perspective)
+      x.address = x.allowed_ips.split("/")[0];  // Allowed_ips in server is the address of the peer (Seen from server perspective)
       x.allowed_ips = null;  // This should be retrieved from peer data config
       return x;
     })

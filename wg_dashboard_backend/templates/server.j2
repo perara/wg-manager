@@ -1,5 +1,5 @@
 [Interface]
-Address = {{ data.address }}
+Address = {{ data.address }}/{{ data.subnet }}
 ListenPort = {{ data.listen_port }}
 PrivateKey = {{ data.private_key }}
 
@@ -13,5 +13,5 @@ PublicKey = {{ peer.public_key }}
 {%- if peer.shared_key %}
 PresharedKey = {{ peer.shared_key }}
 {%- endif %}
-AllowedIPs = {{ peer.address }}
+AllowedIPs = {{ peer.address }}/32
 {% endfor %}

@@ -144,6 +144,7 @@ class PSK(GenericModel):
 class WGServer(GenericModel):
     id: int = None
     address: str = None
+    subnet: int = None
     interface: str
     listen_port: int = None
     endpoint: str = None

@@ -37,7 +37,7 @@ _db: Session = SessionLocal()
 if not database_exists(engine.url):
     ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
     if not ADMIN_USERNAME:
-        raise RuntimeError("Database does not exist and no ADMIN_USER is set")
+        raise RuntimeError("Database does not exist and no ADMIN_USERNAME is set")
 
     ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 
