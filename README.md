@@ -62,16 +62,17 @@ When docker container/server has started, go to http://localhost:8888
 
 
 # Environment variables
-| Environment      | Description                                                              | Recommended |
-|------------------|--------------------------------------------------------------------------|-------------|
-| GUNICORN_CONF    | Location of custom gunicorn configuration                                | default     |
-| WORKERS_PER_CORE | How many concurrent workers should there be per available core (Gunicorn | default     |
-| WEB_CONCURRENCY  | The number of worker processes for handling requests. (Gunicorn)         | 1           |
-| HOST             | 0.0.0.0 or unix:/tmp/gunicorn.sock if reverse proxy. Remember to mount   | 0.0.0.0     |
-| PORT             | The port to use if running with IP host bind                             | 80          |
-| LOG_LEVEL        | Logging level of gunicorn/python                                         | info        |
-| ADMIN_USERNAME   | Default admin username on database creation                              | admin       |
-| ADMIN_PASSWORD   | Default admin password on database creation                              | admin       |
+| Environment         | Description                                                               | Recommended |
+|---------------------|---------------------------------------------------------------------------|-------------|
+| GUNICORN_CONF       | Location of custom gunicorn configuration                                 | default     |
+| WORKERS_PER_CORE    | How many concurrent workers should there be per available core (Gunicorn) | default     |
+| WEB_CONCURRENCY     | The number of worker processes for handling requests. (Gunicorn)          | 1           |
+| HOST                | 0.0.0.0 or unix:/tmp/gunicorn.sock if reverse proxy. Remember to mount    | 0.0.0.0     |
+| PORT                | The port to use if running with IP host bind                              | 80          |
+| LOG_LEVEL           | Logging level of gunicorn/python                                          | info        |
+| ADMIN_USERNAME      | Default admin username on database creation                               | admin       |
+| ADMIN_PASSWORD      | Default admin password on database creation                               | admin       |
+| AUTOSTART_INTERFACE | A comma-separated list of interfaces to automatically start.              | wg0,wg1,wg2 |
 
 # Showcase
 ![Illustration](docs/images/0.png)
