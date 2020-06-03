@@ -33,11 +33,12 @@ The features of wg-manager includes:
   wireguard:
     container_name: wg-manager
     image: perara/wg-manager
+    restart: always
     cap_add:
       - NET_ADMIN
     #network_mode: host # Alternatively
     ports:
-       - 51800:51900/udp
+       - 51800-51900:51800-51900/udp
        - 8888:8888
     volumes:
       - ./wg-manager:/config
@@ -62,16 +63,16 @@ When docker container/server has started, go to http://localhost:8888
 
 
 # Environment variables
-| Environment      | Description                                                              | Recommended |
-|------------------|--------------------------------------------------------------------------|-------------|
-| GUNICORN_CONF    | Location of custom gunicorn configuration                                | default     |
-| WORKERS_PER_CORE | How many concurrent workers should there be per available core (Gunicorn | default     |
-| WEB_CONCURRENCY  | The number of worker processes for handling requests. (Gunicorn)         | 1           |
-| HOST             | 0.0.0.0 or unix:/tmp/gunicorn.sock if reverse proxy. Remember to mount   | 0.0.0.0     |
-| PORT             | The port to use if running with IP host bind                             | 80          |
-| LOG_LEVEL        | Logging level of gunicorn/python                                         | info        |
-| ADMIN_USERNAME   | Default admin username on database creation                              | admin       |
-| ADMIN_PASSWORD   | Default admin password on database creation                              | admin       |
+| Environment      | Description                                                               | Recommended |
+|------------------|---------------------------------------------------------------------------|-------------|
+| GUNICORN_CONF    | Location of custom gunicorn configuration                                 | default     |
+| WORKERS_PER_CORE | How many concurrent workers should there be per available core (Gunicorn) | default     |
+| WEB_CONCURRENCY  | The number of worker processes for handling requests. (Gunicorn)          | 1           |
+| HOST             | 0.0.0.0 or unix:/tmp/gunicorn.sock if reverse proxy. Remember to mount    | 0.0.0.0     |
+| PORT             | The port to use if running with IP host bind                              | 80          |
+| LOG_LEVEL        | Logging level of gunicorn/python                                          | info        |
+| ADMIN_USERNAME   | Default admin username on database creation                               | admin       |
+| ADMIN_PASSWORD   | Default admin password on database creation                               | admin       |
 
 # Showcase
 ![Illustration](docs/images/0.png)
