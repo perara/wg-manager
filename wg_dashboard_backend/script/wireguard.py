@@ -108,7 +108,7 @@ def restart_interface(server: schemas.WGServer):
 def is_running(server: schemas.WGServer):
     try:
         output = _run_wg(server, ["show", server.interface])
-        if output is None:
+        if output is None or b'Unable to access interface: No such device' in output:
             return False
     except Exception as e:
         if b'No such device' in e.output:
