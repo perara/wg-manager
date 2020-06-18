@@ -54,6 +54,14 @@ or [plain docker here](./docs/guides/docker_configuration.md)
 # Method #2: Bare Metal
 - [Installation on Debian/Ubuntu/RPI4](./docs/install.md)
 
+# Using the development branch
+As there is no builds for the development branch, you have to do the following:
+Change `image: perara/wg-manager` to
+```
+build:
+      context: https://github.com/perara/wg-manager.git#dev
+```
+
 # Guides
 - [Importing Existing configuration](./docs/guides/import_existing_server.md)
 - [Reverse Proxy](./docs/guides/reverse_proxy.md)
