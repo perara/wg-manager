@@ -73,12 +73,14 @@ def add_interface(
 
 
 @router.post("/stop", response_model=schemas.WGServer)
-def start_server(
-        form_data: schemas.WGServer
+def stop_server(
+        server: schemas.WGServer,
+        sess: Session = Depends(middleware.get_db)
 ):
-    script.wireguard.stop_interface(form_data)
-    form_data.is_running = script.wireguard.is_running(form_data)
-    return form_data
+    script.wireguard.stop_interface(server)
+    server.is_running = script.wireguard.is_running(server)
+    server.sync(sess)
+    return server
 
 
 @router.post("/start", response_model=schemas.WGServer)
