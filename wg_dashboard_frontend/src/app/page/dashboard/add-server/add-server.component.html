@@ -20,33 +20,15 @@
     <form [formGroup]="serverForm" class="add-server-form">
 
       <p><b>Essentials</b></p>
+
       <table class="add-server-full-width" cellspacing="0"><tr>
         <td>
           <mat-form-field class="add-server-full-width">
           <mat-label>Interface</mat-label>
-          <input formControlName="interface" matInput placeholder="wg0">
-          </mat-form-field>
-        </td>
-        <td>
-          <mat-form-field class="add-server-full-width">
-          <mat-label>Address</mat-label>
-          <input formControlName="address" matInput placeholder="10.0.200.1">
+          <input formControlName="interface" matInput [placeholder]="defaultInterface">
           </mat-form-field>
         </td>
 
-        <td>
-          <mat-form-field matLine class="add-server-full-width">
-            <mat-label>Subnet</mat-label>
-            <select [(ngModel)]='selectedSubnet' matNativeControl formControlName="subnet">
-              <option *ngFor="let subnet of subnets" [value]="subnet">/{{subnet}}</option>
-            </select>
-
-          </mat-form-field>
-        </td>
-
-      </tr></table>
-
-      <table class="add-server-full-width" cellspacing="0"><tr>
         <td>
           <mat-form-field class="add-server-full-width">
             <mat-label>Endpoint</mat-label>
@@ -56,16 +38,73 @@
         <td>
           <mat-form-field class="add-server-full-width">
             <mat-label>Port</mat-label>
-            <input formControlName="listen_port" matInput placeholder="51820">
+            <input formControlName="listen_port" matInput [placeholder]="defaultListenPort">
           </mat-form-field>
         </td>
+
+
+
       </tr></table>
+
+
+      <table class="add-server-full-width" cellspacing="0"><tr>
+
+        <td>
+          <mat-form-field class="add-server-full-width">
+            <mat-label>IPv4 Address</mat-label>
+            <input formControlName="address" matInput [placeholder]="defaultIPv4Address">
+          </mat-form-field>
+        </td>
+
+        <td>
+          <mat-form-field matLine class="add-server-full-width">
+            <mat-label>Subnet</mat-label>
+            <select matNativeControl formControlName="subnet">
+              <option *ngFor="let v4Subnet of v4Subnets" [value]="v4Subnet">/{{v4Subnet}}</option>
+            </select>
+
+          </mat-form-field>
+        </td>
+
+
+      </tr></table>
+
+      <table class="add-server-full-width" cellspacing="0"><tr>
+        <td>
+          <mat-checkbox [checked]="true" #hasIPV6Support (change)="ipv6SupportChanged($event)">IPv6 Support</mat-checkbox>
+        </td>
+
+
+      </tr></table>
+
+      <table *ngIf="hasIPV6Support.checked" class="add-server-full-width" cellspacing="0"><tr>
+
+        <td>
+          <mat-form-field class="add-server-full-width">
+            <mat-label>IPv6 Address</mat-label>
+            <input formControlName="v6_address" matInput [placeholder]="defaultIPv6Address">
+          </mat-form-field>
+        </td>
+
+        <td>
+          <mat-form-field matLine class="add-server-full-width">
+            <mat-label>Subnet</mat-label>
+            <select matNativeControl formControlName="v6_subnet">
+              <option *ngFor="let v6Subnet of v6Subnets" [value]="v6Subnet">/{{v6Subnet}}</option>
+            </select>
+
+          </mat-form-field>
+        </td>
+
+
+      </tr></table>
+
 
       <table class="add-server-full-width" cellspacing="0"><tr>
         <td>
           <mat-form-field class="add-server-full-width">
             <mat-label>Default DNS</mat-label>
-            <input formControlName="dns" matInput placeholder="8.8.8.8">
+            <input formControlName="dns" matInput [placeholder]="defaultIPv4Address">
           </mat-form-field>
         </td>
       </tr></table>

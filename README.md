@@ -5,9 +5,11 @@ The wg-manager provides an easy-to-use graphical web interface to import, setup,
 The features of wg-manager includes:
 
 **Server**
+* IPv4 **and** IPv6 support
 * Create/Delete/Modify
 * Start/Stop/Restart server
-* Import existing
+* Import existing configurations
+* Export server config, along with client config as zip.
 
 **Peer**
 * Create/Delete/Modify
@@ -40,10 +42,14 @@ The features of wg-manager includes:
 
 ## Method #1: Docker-compose
 ```yaml
+version: "2.1"
+services:
   wireguard:
     container_name: wg-manager
     image: perara/wg-manager
     restart: always
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: 0  # Required for IPV6
     cap_add:
       - NET_ADMIN
     #network_mode: host # Alternatively
@@ -91,6 +97,10 @@ When docker container/server has started, go to http://localhost:8888
 | LOG_LEVEL        | Logging level of gunicorn/python                                          | info        |
 | ADMIN_USERNAME   | Default admin username on database creation                               | admin       |
 | ADMIN_PASSWORD   | Default admin password on database creation                               | admin       |
+| POST_UP          | The POST_UP Command (version 4)                                           | default     |
+| POST_DOWN        | The POST_DOWN Command (version 4)                                         | default     |
+| POST_UP_V6       | The POST_UP Command (version 6)                                           | default     |
+| POST_DOWN_V6     | The POST_DOWN Command (version 6)                                         | default     |
 
 # Showcase
 ![Illustration](docs/images/0.png)

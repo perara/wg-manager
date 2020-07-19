@@ -1,0 +1,24 @@
+version: "2.1"
+services:
+
+  server:
+    container_name: wg-manager
+    build: .
+    restart: always
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: 0
+    cap_add:
+      - NET_ADMIN
+    #network_mode: host # Alternatively
+    ports:
+      - 11820:11820/udp
+      - 51800-51900:51800-51900/udp
+      - 8888:8888
+    volumes:
+      - ./wg-manager:/config
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8888
+      ADMIN_PASSWORD: admin
+      ADMIN_USERNAME: admin
+      WEB_CONCURRENCY: 2

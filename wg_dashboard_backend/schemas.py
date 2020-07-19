@@ -114,6 +114,7 @@ class WGPeer(GenericModel):
     id: int = None
     name: str = None
     address: str = None
+    v6_address: str = None
     private_key: str = None
     public_key: str = None
     shared_key: str = None
@@ -144,7 +145,9 @@ class PSK(GenericModel):
 class WGServer(GenericModel):
     id: int = None
     address: str = None
+    v6_address: str = None
     subnet: int = None
+    v6_subnet: int = None
     interface: str
     listen_port: int = None
     endpoint: str = None

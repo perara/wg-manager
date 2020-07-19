@@ -1,6 +1,7 @@
 # Docker Configuration
 ```bash
 docker run -d \
+--sysctl net.ipv6.conf.all.disable_ipv6=0 \
 --cap-add NET_ADMIN \
 --name wg-manager \
 #--net host \

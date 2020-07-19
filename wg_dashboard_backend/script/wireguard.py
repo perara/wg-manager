@@ -27,6 +27,9 @@ class WGPermissionsError(Exception):
     pass
 
 
+class WGPortAlreadyInUse(Exception):
+    pass
+
 class TempServerFile():
     def __init__(self, server: schemas.WGServer):
         self.server = server
@@ -82,8 +85,11 @@ def start_interface(server: schemas.WGServer):
             output = subprocess.check_output(const.CMD_WG_QUICK + ["up", server_file], stderr=subprocess.STDOUT)
             return output
         except Exception as e:
+            print(e.output)
             if b'already exists' in e.output:
                 raise WGAlreadyStartedError("The wireguard device %s is already started." % server.interface)
+            elif b'Address already in use' in e.output:
+                raise WGPortAlreadyInUse("The port %s is already used by another application." % server.listen_port)
 
 
 def stop_interface(server: schemas.WGServer):
@@ -92,7 +98,6 @@ def stop_interface(server: schemas.WGServer):
             output = subprocess.check_output(const.CMD_WG_QUICK + ["down", server_file], stderr=subprocess.STDOUT)
             return output
         except Exception as e:
-
             if b'is not a WireGuard interface' in e.output:
                 raise WGAlreadyStoppedError("The wireguard device %s is already stopped." % server.interface)
 
@@ -111,6 +116,7 @@ def is_running(server: schemas.WGServer):
         if output is None:
             return False
     except Exception as e:
+        print(e.output)
         if b'No such device' in e.output:
             return False
     return True
@@ -197,13 +203,16 @@ def move_server_dir(interface, interface1):
 def generate_config(obj: typing.Union[typing.Dict[schemas.WGPeer, schemas.WGServer], schemas.WGServer]):
     if isinstance(obj, dict) and "server" in obj and "peer" in obj:
         template = "peer.j2"
+        is_ipv6 = obj["server"].v6_address is not None
     elif isinstance(obj, schemas.WGServer) or isinstance(obj, models.WGServer):
         template = "server.j2"
+        is_ipv6 = obj.v6_address is not None
     else:
         raise ValueError("Incorrect input type. Should be WGPeer or WGServer")
 
     result = util.jinja_env.get_template(template).render(
-        data=obj
+        data=obj,
+        is_ipv6=is_ipv6
     )
 
     return result

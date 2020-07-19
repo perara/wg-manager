@@ -32,15 +32,30 @@ def add_interface(
         server: schemas.WGServerAdd,
         sess: Session = Depends(middleware.get_db)
 ):
-    server.post_up = server.post_up if server.post_up != "" else const.DEFAULT_POST_UP
-    server.post_down = server.post_up if server.post_up != "" else const.DEFAULT_POST_DOWN
+
+    # Configure POST UP with defaults if not manually set.
+    if server.post_up == "":
+        server.post_up = const.DEFAULT_POST_UP
+        if server.v6_address is not None:
+            server.post_up += const.DEFAULT_POST_UP_v6
+
+    # Configure POST DOWN with defaults if not manually set.
+    if server.post_down == "":
+        server.post_down = const.DEFAULT_POST_DOWN
+        if server.v6_address is not None:
+            server.post_down += const.DEFAULT_POST_DOWN_v6
+
     peers = server.peers if server.peers else []
 
     # Public/Private key
     try:
 
-        if server.filter_query(sess).count() != 0:
-            raise HTTPException(status_code=400, detail="The server interface %s already exists in the database" % server.interface)
+        if sess.query(models.WGServer)\
+                .filter(
+                    (models.WGServer.interface == server.interface) |
+                    (models.WGServer.address == server.address) |
+                    (models.WGServer.v6_address == server.v6_address)).count() != 0:
+            raise HTTPException(status_code=400, detail="The server interface or ip %s already exists in the database" % server.interface)
 
         if not server.private_key:
             keys = script.wireguard.generate_keys()
@@ -153,11 +168,14 @@ def edit_server(
             peer=peer,
             server=server
         ))
-        peer.sync(sess)
+
+        db_peer = models.WGPeer(**peer.dict())
+        sess.merge(db_peer)
+        sess.commit()
 
     script.wireguard.start_interface(server)
     server.is_running = script.wireguard.is_running(server)
-    server.sync(sess)
+    server.sync(sess)  # TODO - fix this sync mess.
     server.from_db(sess)
 
     return server

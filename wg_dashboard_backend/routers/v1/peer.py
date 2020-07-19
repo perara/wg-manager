@@ -1,5 +1,5 @@
 import ipaddress
-
+import itertools
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -13,6 +13,35 @@ import script.wireguard
 router = APIRouter()
 
 
+def generate_ip_address(server: schemas.WGServer, v6):
+    if v6:
+        address_space = set(
+            itertools.islice(ipaddress.ip_network("fd42:42:42::1/64", strict=False).hosts(), 1, 1024)
+        )
+    else:
+        address_space = set(ipaddress.ip_network(f"{server.address}/{server.subnet}", strict=False).hosts())
+    occupied_space = set()
+
+    # Try add server IP to list.
+    try:
+        occupied_space.add(ipaddress.ip_address(server.v6_address if v6 else server.address))
+    except ValueError:
+        pass
+
+    for p in server.peers:
+
+        # Try add peer ip to list.
+        try:
+            occupied_space.add(ipaddress.ip_address(p.v6_address if v6 else p.address))
+        except ValueError as e:
+            pass  # Ignore invalid addresses. These are out of address_space
+
+    address_space -= occupied_space
+
+    # Select first available address
+    return str(list(sorted(address_space)).pop(0))
+
+
 @router.post("/add", response_model=schemas.WGPeer)
 def add_peer(
         peer_add: schemas.WGPeerAdd,
@@ -21,27 +50,9 @@ def add_peer(
     server = schemas.WGServer(interface=peer_add.server_interface).from_db(sess)
     peer = schemas.WGPeer(server_id=server.id)
 
-    address_space = set(ipaddress.ip_network(f"{server.address}/{server.subnet}", strict=False).hosts())
-    occupied_space = set()
-
-    # Try add server IP to list.
-    try:
-        occupied_space.add(ipaddress.ip_address(server.address.split("/")[0]))
-    except ValueError:
-        pass
-
-    for p in server.peers:
-
-        # Try add peer ip to list.
-        try:
-            occupied_space.add(ipaddress.ip_address(p.address.split("/")[0]))
-        except ValueError as e:
-            pass  # Ignore invalid addresses. These are out of address_space
-
-    address_space -= occupied_space
-
-    # Select first available address
-    peer.address = str(list(sorted(address_space)).pop(0))
+    if server.v6_address:
+        peer.v6_address = generate_ip_address(server, v6=True)
+    peer.address = generate_ip_address(server, v6=False)
 
     # Private public key generation
     keys = script.wireguard.generate_keys()
