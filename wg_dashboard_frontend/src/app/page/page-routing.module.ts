@@ -16,7 +16,7 @@ const routes: Routes = [
   },
   { path: 'user', component: LayoutComponent, children:
   [
-        { path: 'edit', component: EditComponent, pathMatch: 'full' },
+        { path: 'edit', component: EditComponent, pathMatch: 'full', canActivate: [AuthGuard]},
         { path: 'login', component: LoginComponent, pathMatch: 'full' },
   ],
   },
