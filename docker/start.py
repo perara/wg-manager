@@ -18,6 +18,7 @@ if __name__ == "__main__":
     APP_MODULE = os.getenv("APP_MODULE", f"{MODULE_NAME}:{VARIABLE_NAME}")
     GUNICORN_CONF = os.getenv("GUNICORN_CONF", get_location(DEFAULT_GUNICORN_CONF))
     OPTIONS = [
+        "--preload",
         "-k",
         "uvicorn.workers.UvicornWorker",
         "-c",
