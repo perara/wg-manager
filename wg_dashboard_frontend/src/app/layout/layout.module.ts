@@ -12,22 +12,24 @@ import { RouterModule } from '@angular/router';
 import { MatMenuModule } from '@angular/material/menu';
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 import {NotifierModule} from "angular-notifier";
+import {FormsModule} from "@angular/forms";
 
 @NgModule({
   declarations: [LayoutComponent],
-  imports: [
-    CommonModule,
-    MatSidenavModule,
-    MatToolbarModule,
-    MatListModule,
-    MatIconModule,
-    MatButtonModule,
-    FlexLayoutModule,
-    RouterModule,
-    MatMenuModule,
-    MatSlideToggleModule,
-    NotifierModule,
-  ],
+    imports: [
+        CommonModule,
+        MatSidenavModule,
+        MatToolbarModule,
+        MatListModule,
+        MatIconModule,
+        MatButtonModule,
+        FlexLayoutModule,
+        RouterModule,
+        MatMenuModule,
+        MatSlideToggleModule,
+        NotifierModule,
+        FormsModule,
+    ],
   exports: [
 
   ],

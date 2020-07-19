@@ -36,10 +36,11 @@
         <mat-menu #themeMenu="matMenu">
           <button mat-menu-item *ngFor="let theme of themes" (click)="setCurrentTheme(theme)">{{theme.name}}</button>
           <mat-slide-toggle
-            style="margin-top: 10px;"
+            style="margin-top: 10px; padding: 0 16px;"
             color="primary"
-            (click)="toggleDarkMode($event);"
-            [checked]="darkMode">
+            [(ngModel)]="darkMode"
+            (change)="toggleDarkMode()"
+            (click)="$event.stopPropagation();">
             Dark
           </mat-slide-toggle>
         </mat-menu>
