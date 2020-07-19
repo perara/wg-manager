@@ -48,7 +48,7 @@ def _run_wg(server: schemas.WGServer, command):
         return output
     except Exception as e:
         if b'Operation not permitted' in e.output:
-            raise WGPermissionsError("The user has insufficientt permissions for interface %s" % server.interface)
+            raise WGPermissionsError("The user has insufficient permissions for interface %s" % server.interface)
 
 
 def is_installed():
@@ -109,6 +109,9 @@ def is_running(server: schemas.WGServer):
     try:
         output = _run_wg(server, ["show", server.interface])
         if output is None or b'Unable to access interface: No such device' in output:
+            _LOGGER.warning("Unable to access interface: No such device. "
+                            "This may indicate that there is a bug somewhere, "
+                            "or that you have manually deleted parts of the database")
             return False
     except Exception as e:
         if b'No such device' in e.output:
