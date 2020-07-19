@@ -11,7 +11,7 @@ MAINTAINER per@sysx.no
 ENV IS_DOCKER True
 WORKDIR /app
 # Install dependencies
-RUN apk add --no-cache --update wireguard-tools py3-gunicorn python3 py3-pip
+RUN apk add --no-cache --update wireguard-tools py3-gunicorn python3 py3-pip ip6tables
 
 COPY wg_dashboard_backend /app
 

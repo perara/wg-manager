@@ -21,9 +21,19 @@ The features of wg-manager includes:
 * Linux >= 5.6 *(Alternatively: wireguard-dkms)*
 
 # Common Installation Steps
-1. Enable ip forwarding with `sysctl -w net.ipv4.ip_forward=1`
-    * To make the forwarding persistent add `net.ipv4.ip_forward = 1` to `/etc/sysctl.d/99-sysctl.conf`
-2. It is recommended to have a firewall protecting your servers
+1. Enable ip forwarding:
+     ```
+    sysctl -w net.ipv4.ip_forward=1 # IPV4 Support
+    sysctl -w net.ipv6.conf.all.forwarding=1  # IPV6 Support
+     ```
+2. For persistent configuration: 
+    ```
+    cat > /etc/sysctl.d/99-sysctl.conf << EOF
+    net.ipv4.ip_forward = 1
+    net.ipv6.conf.all.forwarding=1
+    EOF
+    ```
+3. It is recommended to have a firewall protecting your servers
 
 ## Notes
 * A few people has experienced issues with running the dockerized method using bridged networking. To fix this, you can use `network_mode: host`. Note that you can no longer reverse-proxy the web interface from reverse proxies such as [jwilder/nginx-proxy](https://hub.docker.com/r/jwilder/nginx-proxy/).
