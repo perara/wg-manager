@@ -127,7 +127,7 @@
                 <!-- Edit buttons -->
                 <app-modal-confirm
                   [noConfirm]="true"
-                  (onConfirm)="selectedPeer=peer; this.editPeerEmitter.emit({type: 'edit', peer: peer}); $event.stopPropagation();"
+                  (onConfirm)="selectedPeer=peer; this.editPeerEmitter.emit({type: 'edit', peer: peer});"
                   icon="edit"
                   hover="Edit {{peer.name}}">
                 </app-modal-confirm>
@@ -148,7 +148,12 @@
             </tr>
             <tr [hidden]="peer !== selectedPeer">
               <td colspan="6">
-                  <app-peer [onEvent]="this.editPeerEmitter" [(peer)]="server.peers[idx]" [(server)]="server"></app-peer>
+                  <app-peer
+                    [cbOnPeerUpdate]="onPeerUpdate"
+                    [onEvent]="this.editPeerEmitter"
+                    [(peer)]="server.peers[idx]"
+                    [(server)]="server">
+                  </app-peer>
               </td>
             </tr>
 

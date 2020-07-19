@@ -50,7 +50,30 @@ def peer_remove(sess: Session, peer: schemas.WGPeer) -> bool:
         sess.delete(db_peer)
         sess.commit()
 
+    server_update_configuration(sess, peer.server_id)
+
     return True
+
+
+def peer_edit(sess: Session, peer: schemas.WGPeer):
+    # Retrieve server from db
+    server: models.WGServer = get_server_by_id(sess, peer.server_id)
+
+    # Generate peer configuration
+    peer.configuration = script.wireguard.generate_config(dict(
+        peer=peer,
+        server=server
+    ))
+
+    # Update database record for Peer
+    sess.query(models.WGPeer) \
+        .filter_by(id=peer.id) \
+        .update(peer.dict(exclude={"id"}))
+    sess.commit()
+
+    server_update_configuration(sess, server.id)
+
+    return peer
 
 
 def peer_key_pair_generate(sess: Session, peer: schemas.WGPeer) -> schemas.WGPeer:
@@ -159,3 +182,11 @@ def server_post_down_set(sess: Session, server: schemas.WGServer) -> bool:
 
 def server_endpoint_set(sess: Session, server: schemas.WGServer) -> bool:
     return server_update_field(sess, server.interface, server, {"endpoint"})
+
+
+def server_update_configuration(sess: Session, server_id: int) -> bool:
+    # Generate server configuration
+    server: models.WGServer = sess.query(models.WGServer).filter_by(id=server_id).one()
+    server.configuration = script.wireguard.generate_config(server)
+    sess.add(server)
+    sess.commit()

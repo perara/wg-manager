@@ -69,6 +69,9 @@ def add_peer(
     if script.wireguard.is_running(server):
         script.wireguard.add_peer(server, peer)
 
+    # Update server configuration
+    db.wireguard.server_update_configuration(sess, db_peer.server_id)
+
     return schemas.WGPeer.from_orm(db_peer)
 
 
@@ -94,27 +97,7 @@ def edit_peer(
         peer: schemas.WGPeer,
         sess: Session = Depends(middleware.get_db)
 ):
-    # Retrieve server from db
-    server: models.WGServer = db.wireguard.get_server_by_id(sess, peer.server_id)
 
-    # Generate peer configuration
-    peer.configuration = script.wireguard.generate_config(dict(
-        peer=peer,
-        server=server
-    ))
+    peer = db.wireguard.peer_edit(sess, peer)
 
-    # Update database record for Peer
-    sess.query(models.WGPeer)\
-        .filter_by(id=peer.id)\
-        .update(peer.dict(exclude={"id"}))
-
-    # Generate server configuration
-    server.configuration = script.wireguard.generate_config(server)
-    sess.add(server)
-
-    sess.commit()
-
-    return dict(
-        peer=peer,
-        server_configuration=server.configuration
-    )
+    return peer

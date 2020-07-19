@@ -158,3 +158,11 @@ def edit_server(
 
     return server
 
+
+@router.get("/config/{server_id}", response_model=str)
+def server_config(
+        server_id: int,
+        sess: Session = Depends(middleware.get_db)
+):
+
+    return db.wireguard.get_server_by_id(sess, server_id=server_id).configuration

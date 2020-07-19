@@ -109,9 +109,9 @@ def is_running(server: schemas.WGServer):
     try:
         output = _run_wg(server, ["show", server.interface])
         if output is None or b'Unable to access interface: No such device' in output:
-            _LOGGER.warning("Unable to access interface: No such device. "
+            _LOGGER.warning("Unable to access interface: No such device. (%s)"
                             "This may indicate that there is a bug somewhere, "
-                            "or that you have manually deleted parts of the database")
+                            "or that you have manually deleted parts of the database", server.interface)
             return False
     except Exception as e:
         if b'No such device' in e.output:

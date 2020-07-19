@@ -35,7 +35,7 @@ export class ServerService {
     return this.http.post(this.peerURL + '/add', server_interface);
   }
 
-  public editPeer(peer: Peer): Subscribable<{ peer: Peer, server_configuration: string }> {
+  public editPeer(peer: Peer): Subscribable<Peer> {
     return this.http.post(this.peerURL + '/edit', peer);
   }
 
@@ -84,8 +84,8 @@ export class ServerService {
     return this.http.post(this.peerURL + '/config', peer);
   }
 
-  public serverConfig(server: Server) {
-    return this.http.post(this.serverURL + '/config', server);
+  public serverConfig(server: Server): Subscribable<string> {
+    return this.http.get(this.serverURL + '/config/' + server.id.toString());
   }
 
   public serverStats(server: Server) {

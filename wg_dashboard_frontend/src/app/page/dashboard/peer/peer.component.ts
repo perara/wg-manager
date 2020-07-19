@@ -16,6 +16,7 @@ export class PeerComponent implements OnInit {
   @Input('server') server: Server;
   @Input('selectedPeer') selectedPeer: Peer;
   @Input('onEvent') editPeerEmitter: EventEmitter<any> = new EventEmitter<any>();
+  @Input('cbOnPeerUpdate') cbOnPeerUpdate: Function;
 
   constructor(public serverAPI: ServerService) { }
 
@@ -27,6 +28,7 @@ export class PeerComponent implements OnInit {
       }
       if (msg.type === 'edit') {
         this.edit();
+
 
       } else if (msg.type == 'delete') {
         this.delete();
@@ -41,11 +43,13 @@ export class PeerComponent implements OnInit {
 
       // Submit the edit (True -> False)
       const idx = this.server.peers.indexOf(this.peer);
-      this.serverAPI.editPeer(this.peer).subscribe((data) => {
-        this.server.configuration = data.server_configuration;
-        Object.keys(data.peer).forEach(k => {
-          this.server.peers[idx][k] = data.peer[k];
+      this.serverAPI.editPeer(this.peer).subscribe((peer) => {
+        Object.keys(peer).forEach(k => {
+          this.server.peers[idx][k] = peer[k];
         });
+
+        // Query server for server configuration update
+        this.cbOnPeerUpdate();
       });
 
     } else if (!this.peer._edit) {
@@ -63,6 +67,9 @@ export class PeerComponent implements OnInit {
     const idx = this.server.peers.indexOf(this.peer);
     this.serverAPI.deletePeer(this.peer).subscribe((apiServer) => {
       this.server.peers.splice(idx, 1);
+
+      // Query server for server configuration update
+      this.cbOnPeerUpdate();
     });
   }
 

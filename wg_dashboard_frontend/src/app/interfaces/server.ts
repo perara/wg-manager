@@ -1,6 +1,7 @@
 import { Peer } from './peer';
 
 export interface Server {
+  id: number;
   address: string;
   interface: string;
   listen_port: string;
