@@ -61,14 +61,15 @@ def add_peer(
         server=server
     ))
 
-    peer.sync(sess)
-    peer.from_db(sess)
+    db_peer = models.WGPeer(**peer.dict())
+    sess.add(db_peer)
+    sess.commit()
 
     # If server is running. Add peer
     if script.wireguard.is_running(server):
         script.wireguard.add_peer(server, peer)
 
-    return peer
+    return schemas.WGPeer.from_orm(db_peer)
 
 
 @router.post("/delete", response_model=schemas.WGPeer)
@@ -76,13 +77,13 @@ def delete_peer(
         peer: schemas.WGPeer,
         sess: Session = Depends(middleware.get_db)
 ):
-    peer.from_db(sess)  # Sync full object
+
+    server = sess.query(models.WGServer).filter_by(id=peer.server_id).one()
 
     if not db.wireguard.peer_remove(sess, peer):
         raise HTTPException(400, detail="Were not able to delete peer %s (%s)" % (peer.name, peer.public_key))
 
-    server = schemas.WGServer(interface=peer.server_id)
-    if script.wireguard.is_running(server):
+    if script.wireguard.is_running(schemas.WGServer(interface=server.interface)):
         script.wireguard.remove_peer(server, peer)
 
     return peer

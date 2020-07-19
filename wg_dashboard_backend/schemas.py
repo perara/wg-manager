@@ -124,8 +124,8 @@ class WGPeer(GenericModel):
 
     class Meta:
         model = models.WGPeer
-        key = "address"
-        excludes = {"id"}
+        key = "id"
+        excludes = {}
 
 
 class WGPeerConfig(GenericModel):

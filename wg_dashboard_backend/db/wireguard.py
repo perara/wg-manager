@@ -43,7 +43,8 @@ def peer_dns_set(sess: Session, peer: schemas.WGPeer) -> schemas.WGPeer:
 
 
 def peer_remove(sess: Session, peer: schemas.WGPeer) -> bool:
-    db_peers = peer.filter_query(sess).all()
+
+    db_peers = sess.query(models.WGPeer).filter_by(id=peer.id).all()
 
     for db_peer in db_peers:
         sess.delete(db_peer)
