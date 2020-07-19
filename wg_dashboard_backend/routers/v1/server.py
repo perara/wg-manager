@@ -122,7 +122,11 @@ def delete_server(
 
 @router.post("/stats", dependencies=[Depends(middleware.auth)])
 def stats_server(server: schemas.WGServer):
-    stats = script.wireguard.get_stats(server)
+    if script.wireguard.is_running(server):
+        stats = script.wireguard.get_stats(server)
+    else:
+        stats = []
+
     return JSONResponse(content=stats)
 
 
