@@ -85,6 +85,8 @@ build:
 # Usage
 When docker container/server has started, go to http://localhost:8888
 
+# API Docs
+The API docs is found [here](./docs/api.md).
 
 # Environment variables
 | Environment      | Description                                                               | Recommended |
