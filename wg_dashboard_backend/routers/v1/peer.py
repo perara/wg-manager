@@ -62,6 +62,7 @@ def add_peer(
     ))
 
     peer.sync(sess)
+    peer.from_db(sess)
 
     # If server is running. Add peer
     if script.wireguard.is_running(server):
