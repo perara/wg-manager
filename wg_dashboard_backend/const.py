@@ -5,6 +5,14 @@ IS_DOCKER = os.getenv("IS_DOCKER", "False") == "True"
 DATABASE_FILE = "/config/database.db" if IS_DOCKER else "./database.db"
 DATABASE_URL = f"sqlite:///{DATABASE_FILE}"
 
+OBFUSCATE_ENABLED = os.getenv("OBFUSCATION", "True") == "True"  # TODO should be false by default
+OBFUSCATE_MODE = os.getenv("OBFUSCATION_MODE", "obfs4")
+OBFUSCATE_SOCKS_TOR_PORT = int(os.getenv("OBFUSCATE_SOCKS_TOR_PORT", "5555"))
+OBFUSCATE_TOR_LISTEN_ADDR = int(os.getenv("OBFUSCATE_TOR_LISTEN_ADDR", "5556"))
+OBFUSCATE_SUPPORTED = ["obfs4"]
+assert OBFUSCATE_MODE in OBFUSCATE_SUPPORTED, "Invalid OBFUSCATE_MODE=%s, Valid options are: %s" % (OBFUSCATE_MODE,
+                                                                                                    OBFUSCATE_SUPPORTED)
+
 os.makedirs("build", exist_ok=True)
 DEFAULT_POST_UP = os.getenv("POST_UP", "iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE;")
 DEFAULT_POST_DOWN = os.getenv("POST_DOWN", "iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE;")
