@@ -46,7 +46,7 @@ def dump_database(
     zf.close()
     in_memory.seek(0)
 
-    now  = datetime.now().strftime("%m-%d-%Y-%H:%M:%S")
+    now = datetime.now().strftime("%m-%d-%Y-%H:%M:%S")
     return StreamingResponse(in_memory, media_type="application/zip", headers={
         "Content-Disposition": f'attachment; filename="wg-manager-dump-{now}.zip"'
     })

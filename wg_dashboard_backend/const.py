@@ -14,6 +14,7 @@ DEFAULT_POST_DOWN_v6 = os.getenv("POST_DOWN_V6", "ip6tables -D FORWARD -i %i -j 
 SECRET_KEY = ''.join(random.choices(string.ascii_uppercase + string.digits, k=64))
 ALGORITHM = "HS256"
 
+API_KEY_LENGTH = 32
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 CMD_WG_COMMAND = ["wg"]
 CMD_WG_QUICK = ["wg-quick"]

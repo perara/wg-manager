@@ -1,6 +1,8 @@
+import datetime
+
 import sqlalchemy
 
-from sqlalchemy import Integer, Column
+from sqlalchemy import Integer, Column, DateTime
 from sqlalchemy.orm import relationship, backref
 from database import Base
 
@@ -14,6 +16,15 @@ class User(Base):
     username = Column(sqlalchemy.String, unique=True)
     full_name = Column(sqlalchemy.String)
     role = Column(sqlalchemy.String)
+
+
+class UserAPIKey(Base):
+    __tablename__ = "api_keys"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    key = Column(sqlalchemy.String, unique=True)
+    user_id = Column(Integer, sqlalchemy.ForeignKey('users.id', ondelete="CASCADE", onupdate="CASCADE"))
+    user = relationship("User", foreign_keys=[user_id])
+    created_date = Column(DateTime, default=datetime.datetime.utcnow)
 
 
 class WGServer(Base):

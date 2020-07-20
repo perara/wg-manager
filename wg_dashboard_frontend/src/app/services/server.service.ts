@@ -16,6 +16,9 @@ export class ServerService {
   public serverURL = this.base + "server";
   public peerURL = this.base + "peer";
   public wgURL = this.base + "wg";
+  public userURL = this.base + "users";
+  public apiKeyURL = this.userURL + "/api-key"
+
 
 
   constructor(private config: ConfigService, private http: HttpClient, private notify: NotifierService) {
@@ -90,5 +93,20 @@ export class ServerService {
 
   public serverStats(server: Server) {
     return this.http.post(this.serverURL + '/stats', server);
+  }
+
+  public addAPIKey() {
+    return this.http.get(this.apiKeyURL + '/add');
+  }
+
+  public getAPIKeys() {
+    return this.http.get(this.apiKeyURL + '/list');
+  }
+
+  public deleteAPIKey(api_key_id: { id: number }) {
+    return this.http.post(this.apiKeyURL + '/delete', {
+      key_id: api_key_id
+    });
+
   }
 }

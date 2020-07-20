@@ -11,6 +11,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 import const
+import models
 import schemas
 from database import SessionLocal
 import db.user
@@ -56,7 +57,13 @@ def create_access_token(*, data: dict, expires_delta: timedelta = None):
     return encoded_jwt
 
 
-def auth(token: str = Depends(oauth2_scheme), sess: Session = Depends(get_db)):
+def retrieve_api_key(request: Request):
+    return request.headers.get("X-API-Key", None)
+
+
+def auth(token: str = Depends(oauth2_scheme), api_key: str = Depends(retrieve_api_key), sess: Session = Depends(get_db)):
+
+    username = None
 
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -64,14 +71,22 @@ def auth(token: str = Depends(oauth2_scheme), sess: Session = Depends(get_db)):
         headers={"WWW-Authenticate": "Bearer"},
     )
 
+    # Attempt to authenticate using JWT
     try:
         payload = jwt.decode(token, const.SECRET_KEY, algorithms=[const.ALGORITHM])
         username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-
     except PyJWTError:
+        pass
+
+    try:
+        db_user_api_key = sess.query(models.UserAPIKey).filter_by(key=api_key).one()
+        username = db_user_api_key.user.username
+    except Exception:
+        pass
+
+    if username is None:
         raise credentials_exception
+
     user = schemas.User.from_orm(
         schemas.UserInDB(username=username, password="").from_db(sess)
     )

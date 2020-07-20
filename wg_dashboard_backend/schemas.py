@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pydantic
 from pydantic import BaseModel, typing
 from sqlalchemy.orm import Session, Query
@@ -98,6 +100,15 @@ class User(GenericModel):
         model = models.User
         key = "username"
         excludes = {"id"}
+
+
+class UserAPIKey(GenericModel):
+    id: int
+    created_date: datetime
+
+
+class UserAPIKeyFull(UserAPIKey):
+    key: str
 
 
 class UserInDB(User):

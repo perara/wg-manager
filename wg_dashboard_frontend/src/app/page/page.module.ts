@@ -9,9 +9,11 @@ import { MatInputModule } from '@angular/material/input';
 import { FlexModule } from '@angular/flex-layout';
 import { EditComponent } from './user/edit/edit.component';
 import { MatButtonModule } from '@angular/material/button';
+import {MatTableModule} from "@angular/material/table";
+import { ApiKeyComponent } from './user/edit/api-key/api-key.component';
 
 @NgModule({
-  declarations: [LoginComponent, EditComponent],
+  declarations: [LoginComponent, EditComponent, ApiKeyComponent],
   imports: [
     CommonModule,
     PageRoutingModule,
@@ -22,6 +24,7 @@ import { MatButtonModule } from '@angular/material/button';
     MatInputModule,
     FlexModule,
     MatButtonModule,
+    MatTableModule,
   ],
 
 })

@@ -15,6 +15,7 @@ The features of wg-manager includes:
 * Create/Delete/Modify
 * Bandwidth usage statistics
 * Export by QRCode, Text
+* Authentication via API-Keys for automation (Created in GUI)
 
 **General**
 * Modify Admin User
@@ -87,6 +88,12 @@ When docker container/server has started, go to http://localhost:8888
 
 # API Docs
 The API docs is found [here](./docs/api.md).
+
+# API-Keys
+1. Login to wg-manager
+2. Go to edit profile
+3. Create API-Key and take note of the key. Use the X-API-Key header to authenticate.
+4. Example: `curl -i -H "X-API-Key: <key-goes-here>" http://<host>:<port>/api/v1/users/api-key/list`
 
 # Environment variables
 | Environment      | Description                                                               | Recommended |

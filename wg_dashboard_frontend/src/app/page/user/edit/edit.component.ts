@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '@services/*';
 import { Router } from '@angular/router';
+import {ServerService} from "../../../services/server.service";
 
 @Component({
   selector: 'app-edit',
@@ -23,8 +24,10 @@ export class EditComponent implements OnInit {
   public user: any;
   public error: string;
 
-  constructor(private authService: AuthService,
-              private router: Router) {
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {
 
   }
 
