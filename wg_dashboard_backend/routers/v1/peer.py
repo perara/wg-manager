@@ -2,6 +2,7 @@ import ipaddress
 import itertools
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from starlette.responses import PlainTextResponse
 
 import const
 import models
@@ -48,6 +49,10 @@ def add_peer(
         sess: Session = Depends(middleware.get_db)
 ):
     server = schemas.WGServer(interface=peer_add.server_interface).from_db(sess)
+
+    if server is None:
+        raise HTTPException(500, detail="The server-interface '%s' does not exist!" % peer_add.server_interface)
+
     peer = schemas.WGPeer(server_id=server.id)
 
     if server.v6_address:
@@ -84,6 +89,15 @@ def add_peer(
     db.wireguard.server_update_configuration(sess, db_peer.server_id)
 
     return schemas.WGPeer.from_orm(db_peer)
+
+
+@router.post("/add/configuration")
+def add_peer_get_config(peer_add: schemas.WGPeerAdd,
+                        sess: Session = Depends(middleware.get_db)
+                        ):
+    wg_peer: schemas.WGPeer = add_peer(peer_add, sess)
+
+    return PlainTextResponse(wg_peer.configuration)
 
 
 @router.post("/delete", response_model=schemas.WGPeer)

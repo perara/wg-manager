@@ -94,7 +94,7 @@ The API docs is found [here](./docs/api.md).
 2. Go to edit profile
 3. Create API-Key and take note of the key. Use the X-API-Key header to authenticate.
 4. Example: `curl -i -H "X-API-Key: <key-goes-here>" http://<host>:<port>/api/v1/users/api-key/list`
-
+5. Example 2: `curl -X POST "http://<host>:<port>/api/v1/peer/add/configuration" -H "accept: application/json" -H "Content-Type: application/json" -H "X-API-Key: <api-key-here>" -d "{\"server_interface\":\"wg0\"}"`
 # Environment variables
 | Environment      | Description                                                               | Recommended |
 |------------------|---------------------------------------------------------------------------|-------------|
@@ -135,7 +135,3 @@ The API docs is found [here](./docs/api.md).
 - Implement multi-server support (setting up site-2-site servers from the GUI)
 - Extending multi-server support to enable custom access lists (A peer can be assigned to multiple servers, as part of the ACL)
 
-### Other
-* Eventual bugfixes
-* Improve Auth
-* Improve everything...
