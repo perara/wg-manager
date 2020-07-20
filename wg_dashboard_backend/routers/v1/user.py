@@ -78,9 +78,3 @@ def create_user(
         )):
             raise HTTPException(status_code=400, detail="Could not create user")
 
-    return login_for_access_token(OAuth2PasswordRequestForm(
-        username=form_data.username,
-        password=form_data.password,
-        scope=""
-    ), sess)
-
