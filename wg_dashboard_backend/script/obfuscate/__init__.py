@@ -1,7 +1,10 @@
 import abc
 from pathlib import Path
 import subprocess
-import shlex
+
+
+class NotInstalledError(Exception):
+    pass
 
 
 class BaseObfuscation(abc.ABC):
@@ -9,7 +12,7 @@ class BaseObfuscation(abc.ABC):
     def __init__(self, binary_name=None, binary_path=None, algorithm=None):
 
         assert binary_name is not None or binary_path is not None
-        self.binary_name = binary_name if binary_name is not None else Path(self.binary_path).name
+        self.binary_name = binary_name if binary_name is not None else Path(binary_path).name
         self.binary_path = binary_path if binary_path else ""
         self.algorithm = algorithm
 
@@ -23,7 +26,7 @@ class BaseObfuscation(abc.ABC):
             data = [x.decode().strip() for x in proc_which.communicate() if x != b''][0]
 
             if proc_which.returncode != 0:
-                raise RuntimeError("Could not find binary '%s'" % data)
+                raise NotInstalledError("Could not find binary '%s'" % data)
 
             self.binary_path = data
 
@@ -38,7 +41,7 @@ class BaseObfuscation(abc.ABC):
             #kill_output, kill_code = self.execute(*[pattern], override_command="pkill")
 
         command = override_command if override_command is not None else self.binary_path
-        print(shlex.join([command] + list(args)))
+
         proc_which = subprocess.Popen([command] + list(args), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         raw_data = proc_which.communicate()
 
