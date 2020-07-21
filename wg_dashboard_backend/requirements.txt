@@ -13,3 +13,4 @@ sqlalchemy_utils
 sqlalchemy-migrate
 requests
 uvicorn
+qrcode[pil]
