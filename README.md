@@ -20,6 +20,7 @@ The features of wg-manager includes:
 
 **General**
 * Modify Admin User
+* Create and manage API-Keys
 
 # Dependencies
 * Linux >= 5.6 *(Alternatively: wireguard-dkms)*
