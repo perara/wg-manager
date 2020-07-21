@@ -45,7 +45,7 @@ def generate_ip_address(server: schemas.WGServer, v6):
 
 @router.post("/add", response_model=schemas.WGPeer)
 def add_peer(
-        peer_add: schemas.WGPeerAdd,
+        peer_add: schemas.WGPeerConfigAdd,
         sess: Session = Depends(middleware.get_db)
 ):
     server = schemas.WGServer(interface=peer_add.server_interface).from_db(sess)
@@ -68,7 +68,7 @@ def add_peer(
     peer.allowed_ips = ', '.join(const.PEER_DEFAULT_ALLOWED_IPS)
 
     # Set unnamed
-    peer.name = "Unnamed"
+    peer.name = "Unnamed" if not peer_add.name else peer_add.name
 
     peer.dns = server.dns
 
@@ -91,8 +91,26 @@ def add_peer(
     return schemas.WGPeer.from_orm(db_peer)
 
 
-@router.post("/add/configuration")
-def add_peer_get_config(peer_add: schemas.WGPeerAdd,
+@router.post("/configuration/get_or_add")
+def get_or_add_peer_return_config(peer_get: schemas.WGPeerConfigGetByName,
+                        sess: Session = Depends(middleware.get_db)
+                        ):
+    server = sess.query(models.WGServer).filter_by(interface=peer_get.server_interface).one()
+    peer = sess.query(models.WGPeer).filter_by(name=peer_get.name, server_id=server.id).all()
+
+    if not peer:
+        return add_peer_get_config(schemas.WGPeerConfigAdd(
+            name=peer_get.name,
+            server_interface=peer_get.server_interface
+        ), sess=sess)
+
+    peer = peer[0]
+
+    return PlainTextResponse(peer.configuration)
+
+
+@router.post("/configuration/add")
+def add_peer_get_config(peer_add: schemas.WGPeerConfigAdd,
                         sess: Session = Depends(middleware.get_db)
                         ):
     wg_peer: schemas.WGPeer = add_peer(peer_add, sess)

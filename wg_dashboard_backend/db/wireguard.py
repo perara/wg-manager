@@ -1,7 +1,11 @@
 import ipaddress
+import json
 import os
 import shutil
 import typing
+
+from starlette.exceptions import HTTPException
+
 import const
 import script.wireguard
 from sqlalchemy import exists
@@ -43,7 +47,6 @@ def peer_dns_set(sess: Session, peer: schemas.WGPeer) -> schemas.WGPeer:
 
 
 def peer_remove(sess: Session, peer: schemas.WGPeer) -> bool:
-
     db_peers = sess.query(models.WGPeer).filter_by(id=peer.id).all()
 
     for db_peer in db_peers:
@@ -132,8 +135,95 @@ def server_update_field(sess: Session, interface: str, server: schemas.WGServer,
 
 
 def server_get_all(sess: Session) -> typing.List[schemas.WGServer]:
-    db_interfaces = sess.query(models.WGServer).all()
+    db_interfaces = sess.query(models.WGServer) \
+        .all()
     return [schemas.WGServer.from_orm(db_interface) for db_interface in db_interfaces]
+
+
+def server_add_on_init(sess: Session):
+    """
+    Routine for adding server from env variable.
+    :param server:
+    :param sess:
+    :return:
+    """
+    try:
+        init_data = json.loads(const.SERVER_INIT_INTERFACE)
+
+        if init_data["endpoint"] == "||external||":
+            import requests
+            init_data["endpoint"] = requests.get("https://api.ipify.org").text
+        elif init_data["endpoint"] == "||internal||":
+            import socket
+            init_data["endpoint"] = socket.gethostbyname(socket.gethostname())
+
+        if sess.query(models.WGServer) \
+                .filter_by(endpoint=init_data["endpoint"], listen_port=init_data["listen_port"]) \
+                .count() == 0:
+            # Only add if it does not already exists.
+            server_add(schemas.WGServerAdd(**init_data), sess, start=const.SERVER_INIT_INTERFACE_START)
+    except Exception as e:
+        _LOGGER.warning("Failed to setup initial server interface with exception:")
+        _LOGGER.exception(e)
+
+
+def server_add(server: schemas.WGServerAdd, sess: Session, start=False):
+    # Configure POST UP with defaults if not manually set.
+    if server.post_up == "":
+        server.post_up = const.DEFAULT_POST_UP
+        if server.v6_address is not None:
+            server.post_up += const.DEFAULT_POST_UP_v6
+
+    # Configure POST DOWN with defaults if not manually set.
+    if server.post_down == "":
+        server.post_down = const.DEFAULT_POST_DOWN
+        if server.v6_address is not None:
+            server.post_down += const.DEFAULT_POST_DOWN_v6
+
+    peers = server.peers if server.peers else []
+
+    # Public/Private key
+    try:
+
+        if sess.query(models.WGServer) \
+                .filter(
+            (models.WGServer.interface == server.interface) |
+            (models.WGServer.address == server.address) |
+            (models.WGServer.v6_address == server.v6_address)).count() != 0:
+            raise HTTPException(status_code=400,
+                                detail="The server interface or ip %s already exists in the database" % server.interface)
+
+        if not server.private_key:
+            keys = script.wireguard.generate_keys()
+            server.private_key = keys["private_key"]
+            server.public_key = keys["public_key"]
+
+        server.configuration = script.wireguard.generate_config(server)
+        server.peers = []
+        server.sync(sess)
+
+        if len(peers) > 0:
+            server.from_db(sess)
+
+            for schemaPeer in peers:
+                schemaPeer.server_id = server.id
+                schemaPeer.configuration = script.wireguard.generate_config(dict(
+                    peer=schemaPeer,
+                    server=server
+                ))
+                dbPeer = models.WGPeer(**schemaPeer.dict())
+                sess.add(dbPeer)
+                sess.commit()
+
+        server.from_db(sess)
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    if start and not script.wireguard.is_running(server):
+        script.wireguard.start_interface(server)
+
+    return server
 
 
 def server_remove(sess: Session, server: schemas.WGServer) -> bool:

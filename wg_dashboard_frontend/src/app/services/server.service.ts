@@ -31,15 +31,17 @@ export class ServerService {
 
   public serverPerformAction(action: string, item: any): Subscribable<Server> {
     return this.http.post(this.serverURL + '/' + action, item)
-      .pipe(catchError(this.config.handleError));
+      .pipe(catchError(this.config.handleError.bind(this)));
   }
 
   public addPeer(server_interface: any): Subscribable<Peer> {
-    return this.http.post(this.peerURL + '/add', server_interface);
+    return this.http.post(this.peerURL + '/add', server_interface)
+      .pipe(catchError(this.config.handleError.bind(this)));
   }
 
   public editPeer(peer: Peer): Subscribable<Peer> {
-    return this.http.post(this.peerURL + '/edit', peer);
+    return this.http.post(this.peerURL + '/edit', peer)
+      .pipe(catchError(this.config.handleError.bind(this)));
   }
 
   public getServers(): Observable<Server[]> {
@@ -53,7 +55,7 @@ export class ServerService {
   }
 
   public startServer(item: Server): Subscribable<Server> {
-    return this.serverPerformAction('start', item);
+    return this.serverPerformAction('start', item)
   }
 
   public stopServer(item: Server): Subscribable<Server> {
@@ -76,37 +78,45 @@ export class ServerService {
   }
 
   public getKeyPair() {
-    return this.http.get(this.wgURL + '/generate_keypair');
+    return this.http.get(this.wgURL + '/generate_keypair')
+      .pipe(catchError(this.config.handleError.bind(this)));
   }
 
   public getPSK() {
-    return this.http.get(this.wgURL + '/generate_psk');
+    return this.http.get(this.wgURL + '/generate_psk')
+      .pipe(catchError(this.config.handleError.bind(this)));
   }
 
   public peerConfig(peer: Peer) {
-    return this.http.post(this.peerURL + '/config', peer);
+    return this.http.post(this.peerURL + '/config', peer)
+      .pipe(catchError(this.config.handleError.bind(this)));
   }
 
   public serverConfig(server: Server): Subscribable<string> {
-    return this.http.get(this.serverURL + '/config/' + server.id.toString());
+    return this.http.get(this.serverURL + '/config/' + server.id.toString())
+      .pipe(catchError(this.config.handleError.bind(this)));
   }
 
   public serverStats(server: Server) {
-    return this.http.post(this.serverURL + '/stats', server);
+    return this.http.post(this.serverURL + '/stats', server)
+      .pipe(catchError(this.config.handleError.bind(this)));
   }
 
   public addAPIKey() {
-    return this.http.get(this.apiKeyURL + '/add');
+    return this.http.get(this.apiKeyURL + '/add')
+      .pipe(catchError(this.config.handleError.bind(this)));
   }
 
   public getAPIKeys() {
-    return this.http.get(this.apiKeyURL + '/list');
+    return this.http.get(this.apiKeyURL + '/list')
+      .pipe(catchError(this.config.handleError.bind(this)));
   }
 
   public deleteAPIKey(api_key_id: { id: number }) {
     return this.http.post(this.apiKeyURL + '/delete', {
       key_id: api_key_id
-    });
+    })
+      .pipe(catchError(this.config.handleError.bind(this)));
 
   }
 }

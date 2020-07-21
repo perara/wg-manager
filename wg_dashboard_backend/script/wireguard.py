@@ -1,16 +1,21 @@
 import logging
+import random
 import subprocess
 import tempfile
-
+import requests
 import typing
+import configparser
+
+from sqlalchemy.orm import Session
 
 import const
 import models
 import schemas
 import os
 import re
-
+import ipaddress
 import util
+from database import SessionLocal
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -29,6 +34,7 @@ class WGPermissionsError(Exception):
 
 class WGPortAlreadyInUse(Exception):
     pass
+
 
 class TempServerFile():
     def __init__(self, server: schemas.WGServer):
@@ -78,10 +84,10 @@ def generate_psk():
     return subprocess.check_output(const.CMD_WG_COMMAND + ["genpsk"]).decode("utf-8").strip()
 
 
-def start_interface(server: schemas.WGServer):
+def start_interface(server: typing.Union[schemas.WGServer, schemas.WGPeer]):
     with TempServerFile(server) as server_file:
         try:
-            #print(*const.CMD_WG_QUICK, "up", server_file)
+            # print(*const.CMD_WG_QUICK, "up", server_file)
             output = subprocess.check_output(const.CMD_WG_QUICK + ["up", server_file], stderr=subprocess.STDOUT)
             return output
         except Exception as e:
@@ -113,7 +119,7 @@ def restart_interface(server: schemas.WGServer):
 def is_running(server: schemas.WGServer):
     try:
         output = _run_wg(server, ["show", server.interface])
-        if output is None:
+        if output is None or b'Unable to access interface: No such device' in output:
             return False
     except Exception as e:
         print(e.output)
@@ -217,3 +223,182 @@ def generate_config(obj: typing.Union[typing.Dict[schemas.WGPeer, schemas.WGServ
 
     return result
 
+
+def retrieve_client_conf_from_server(
+        client_name,
+        server_interface,
+        server_host,
+        server_api_key
+):
+    const.CLIENT_NAME = "client-1"
+    const.CLIENT_SERVER_INTERFACE = "wg0"
+    const.CLIENT_SERVER_HOST = "http://localhost:4200"
+    const.CLIENT_API_KEY = "8bae20143fb962930614952d80634822361fd5ab9488053866a56de5881f9d7b"
+
+    assert server_interface is not None and \
+           server_host is not None and \
+           server_api_key is not None, "Client configuration is invalid: %s, %s, api-key-is-null?: %s" % (
+        server_interface,
+        server_host,
+        server_api_key is None
+    )
+
+    api_get_or_add = f"{server_host}/api/v1/peer/configuration/get_or_add"
+
+    response = requests.post(api_get_or_add, json={
+        "server_interface": server_interface,
+        "name": client_name
+    }, headers={
+        "X-API-Key": server_api_key
+    })
+
+    if response.status_code != 200:
+        print(response.text)
+        raise RuntimeError("Could not retrieve config from server: %s" % (api_get_or_add,))
+
+    return response.text
+
+
+def create_client_config(sess: Session, configuration, client_name):
+
+    parser = configparser.ConfigParser()
+    parser.read_string(configuration)
+    public_key = parser["Peer"]["PublicKey"]
+
+    assert len(set(parser.sections()) - {"Interface", "Peer"}) == 0, "Missing Interface or Peer section"
+
+    # Parse Server
+    # Check if server already exists.
+
+    is_new_server = False
+    is_new_peer = False
+
+    try:
+        db_server = sess.query(models.WGServer).filter_by(
+            public_key=public_key,
+            read_only=1
+        ).one()
+    except:
+        db_server = None
+
+    if db_server is None:
+        db_server = models.WGServer()
+        is_new_server = True
+
+    db_server.read_only = 1
+    db_server.public_key = parser["Peer"]["PublicKey"]
+    db_server.address = parser["Peer"]["Endpoint"]
+    db_server.listen_port = random.randint(69000, 19292009)
+
+    db_server.v6_address = "N/A"
+    db_server.v6_subnet = 0
+    db_server.address = "N/A"
+    db_server.subnet = 0
+    db_server.private_key = "N/A"
+    db_server.dns = "N/A"
+    db_server.post_up = "N/A"
+    db_server.post_down = "N/A"
+    db_server.is_running = False
+    db_server.configuration = "N/A"
+
+    # Parse client
+    try:
+        db_peer = sess.query(models.WGPeer).filter_by(
+            private_key=parser["Interface"]["PrivateKey"],
+            read_only=1
+        ).one()
+    except:
+        db_peer = None
+
+    if db_peer is None:
+        db_peer = models.WGPeer()
+        is_new_peer = True
+
+    db_peer.read_only = 1
+    db_peer.name = client_name
+
+    addresses_split = parser["Interface"]["Address"].split(",")
+    assert len(addresses_split) > 0, "Must be at least one address"
+
+    for address_with_subnet in addresses_split:
+        addr, subnet = address_with_subnet.split("/")
+
+        if isinstance(ipaddress.ip_address(addr), ipaddress.IPv4Address):
+            db_peer.address = address_with_subnet
+        elif isinstance(ipaddress.ip_address(addr), ipaddress.IPv6Address):
+            db_peer.v6_address = address_with_subnet
+        else:
+            raise RuntimeError("Incorrect IP Address: %s, %s" % (addr, subnet))
+
+    db_peer.private_key = parser["Interface"]["PrivateKey"]
+    db_peer.public_key = "N/A"
+    db_peer.allowed_ips = parser["Peer"]["AllowedIPs"]
+    db_peer.configuration = configuration
+    db_server.interface = f"client_{db_peer.name}"
+    db_server.configuration = configuration
+    try:
+        db_peer.shared_key = parser["Interface"]["PrivateKey"]
+    except KeyError:
+        db_peer.shared_key = "N/A"
+
+    db_peer.dns = parser["Interface"]["DNS"]
+    db_peer.server = db_server
+
+    if is_new_server:
+        sess.add(db_server)
+    else:
+        sess.merge(db_server)
+    sess.commit()
+
+    if is_new_peer:
+        sess.add(db_peer)
+    else:
+        sess.merge(db_peer)
+    sess.commit()
+
+    if const.CLIENT_START_AUTOMATICALLY and not is_running(db_server):
+        start_interface(db_server)
+
+
+def load_environment_clients(sess: Session):
+    i = 1
+    while True:
+
+        client_name = os.getenv(f"CLIENT_{i}_NAME", None)
+        client_server_interface = os.getenv(f"CLIENT_{i}_SERVER_INTERFACE", None)
+        client_server_host = os.getenv(f"CLIENT_{i}_SERVER_HOST", None)
+        client_api_key = os.getenv(f"CLIENT_{i}_API_KEY", None)
+
+        if client_api_key is None or \
+                client_server_interface is None or \
+                client_server_host is None or \
+                client_api_key is None:
+            break
+
+        _LOGGER.warning(
+            f"Found client configuration: name={client_name},siface={client_server_interface},shost={client_server_host}")
+
+        config = retrieve_client_conf_from_server(
+            client_name=client_name,
+            server_interface=client_server_interface,
+            server_host=client_server_host,
+            server_api_key=client_api_key
+        )
+
+        create_client_config(sess, configuration=config, client_name=client_name)
+
+        i += 1
+
+
+if __name__ == "__main__":
+    os.environ["CLIENT_1_NAME"] = "client-1"
+    os.environ["CLIENT_1_SERVER_INTERFACE"] = "wg0"
+    os.environ["CLIENT_1_SERVER_HOST"] = "http://localhost:4200"
+    os.environ["CLIENT_1_API_KEY"] = "8bae20143fb962930614952d80634822361fd5ab9488053866a56de5881f9d7b"
+    os.environ["CLIENT_2_NAME"] = "client-2"
+    os.environ["CLIENT_2_SERVER_INTERFACE"] = "wg0"
+    os.environ["CLIENT_2_SERVER_HOST"] = "http://localhost:4200"
+    os.environ["CLIENT_2_API_KEY"] = "8bae20143fb962930614952d80634822361fd5ab9488053866a56de5881f9d7b"
+    sess: Session = SessionLocal()
+    load_environment_clients(sess)
+    sess.close()

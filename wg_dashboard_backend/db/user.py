@@ -7,13 +7,11 @@ from passlib.context import CryptContext
 import schemas
 
 
-
-
 def update_user(sess: Session, form_data: schemas.UserInDB):
     user = get_user_by_name(sess, form_data.username)
     user.password = form_data.password
     user.full_name = form_data.full_name
-    user.email = form_data.email  # TOD this section should be updated
+    user.email = form_data.email  # TODO this section should be updated
 
     sess.add(user)
     sess.commit()

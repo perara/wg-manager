@@ -169,6 +169,7 @@ class WGServer(GenericModel):
     post_up: str = None
     post_down: str = None
     dns: str = None
+    read_only: int = None
 
     peers: pydantic.typing.List['WGPeer'] = []
 
@@ -188,6 +189,11 @@ class WGServerAdd(WGServer):
     listen_port: int
 
 
-class WGPeerAdd(GenericModel):
+class WGPeerConfigAdd(GenericModel):
     server_interface: str
+    name: str = None
 
+
+class WGPeerConfigGetByName(GenericModel):
+    server_interface: str
+    name: str = None

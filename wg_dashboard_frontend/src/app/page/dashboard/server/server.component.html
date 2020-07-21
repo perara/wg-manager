@@ -1,5 +1,5 @@
 
-<mat-card class="dashboard-card">
+<mat-card class="dashboard-card" *ngIf="server.read_only == 0">
 
   <mat-card-header>
     <mat-card-title class="card-container-left">
@@ -15,6 +15,7 @@
     <mat-card-title class="card-container-right">
 
       <app-modal-confirm
+        *ngIf="server.read_only == 0"
         [noConfirm]="true"
         (onConfirm)="downloadServerConfig()"
         area="true"
@@ -33,6 +34,7 @@
       </app-modal-confirm>
 
       <app-modal-confirm
+        *ngIf="server.read_only == 0"
         [noConfirm]="true"
         (onConfirm)="addPeer()"
         icon="person_add"
@@ -67,6 +69,7 @@
       </app-modal-confirm>
 
       <app-modal-confirm
+        *ngIf="server.read_only == 0"
         [noConfirm]="true"
         (onConfirm)="edit()"
         icon="edit"
@@ -83,13 +86,21 @@
 
     </mat-card-title>
 
-    <mat-card-subtitle style="margin-top: 2px;">Endpoint: <b>{{server.endpoint}}:{{server.listen_port}}</b> - Address: <b>{{server.address}}/{{server.subnet}}</b></mat-card-subtitle>
+    <mat-card-subtitle *ngIf="server.read_only == 0" style="margin-top: 2px;">Endpoint: <b>{{server.endpoint}}:{{server.listen_port}}</b> - Address: <b>{{server.address}}/{{server.subnet}}</b></mat-card-subtitle>
+
+    <!-- Read-only, usually client "fake-server" -->
+    <mat-card-subtitle *ngIf="server.read_only == 1" style="margin-top: 2px;">
+      Address: <b>{{server.peers[0].address}}, {{server.peers[0].v6_address}}</b>
+      <br>DNS: <b>{{server.peers[0].dns}}</b>
+      <br>Allowed-IP's <b>{{server.peers[0].allowed_ips}}</b>
+      <br>Endpoint: <b>{{ getEndpointFromConfig(server.peers[0].configuration)}}</b>
+    </mat-card-subtitle>
   </mat-card-header>
 
-  <mat-card-content class="dashboard-card-content">
+  <mat-card-content *ngIf="server.read_only == 0" class="dashboard-card-content">
 
 
-    <table class="table">
+    <table class="table" >
       <thead>
         <tr>
           <th>Name</th>
@@ -169,3 +180,86 @@
   <mat-card-actions>
   </mat-card-actions>
 </mat-card>
+
+<ng-container *ngIf="server.read_only == 1">
+
+  <mat-card class="dashboard-card" *ngFor="let srv_peer of server.peers">
+
+    <mat-card-header>
+      <mat-card-title class="card-container-left">
+
+        <mat-icon
+          class="app-material-icon-valign"
+          [class]="{'green': server.is_running, 'red': !server.is_running}"
+          matTooltip="Indicates if the server is online or offline"
+        >check_circle</mat-icon>
+        {{srv_peer.name}}
+
+      </mat-card-title>
+      <mat-card-title class="card-container-right">
+
+        <app-modal-confirm
+          [qrCode]="true"
+          [noConfirm]="false"
+          area="true"
+          icon="settings"
+          title="Configuration"
+          [text]="server.configuration"
+          hover="Show config for {{server.interface}}">
+        </app-modal-confirm>
+
+        <app-modal-confirm
+          *ngIf="!server.is_running"
+          [noConfirm]="true"
+          (onConfirm)="start()"
+          icon="play_arrow"
+          hover="Start {{server.interface}}">
+        </app-modal-confirm>
+
+        <app-modal-confirm
+          *ngIf="server.is_running"
+          [noConfirm]="false"
+          (onConfirm)="stop()"
+          title="Stop server {{server.interface}}?"
+          text="Are you sure you want to stop this server? This may cause you or your clients to lose connection to the server."
+          icon="stop"
+          hover="Stop {{server.interface}}">
+        </app-modal-confirm>
+
+        <app-modal-confirm
+          [noConfirm]="false"
+          (onConfirm)="restart()"
+          title="Restart server {{server.interface}}?"
+          text="Are you sure you want to restart this server? This may cause you or your clients to lose connection to the server."
+          icon="autorenew"
+          hover="Restart {{server.interface}}">
+        </app-modal-confirm>
+
+        <app-modal-confirm
+          (onConfirm)="delete()"
+          title="Delete {{server.interface}}"
+          text="Are you sure you want to delete {{server.interface}}"
+          icon="delete"
+          hover="Delete {{server.interface}}">
+        </app-modal-confirm>
+
+      </mat-card-title>
+
+      <!-- Read-only, usually client "fake-server" -->
+      <mat-card-subtitle style="margin-top: 2px;">
+        Address: <b>{{srv_peer.address}}, {{srv_peer.v6_address}}</b>
+        <br>DNS: <b>{{srv_peer.dns}}</b>
+        <br>Allowed-IP's <b>{{srv_peer.allowed_ips}}</b>
+        <br>Endpoint: <b>{{ getEndpointFromConfig(srv_peer.configuration)}}</b>
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content class="dashboard-card-content">
+
+
+    </mat-card-content>
+    <mat-card-actions>
+    </mat-card-actions>
+  </mat-card>
+
+</ng-container>
