@@ -64,6 +64,7 @@ export class AddServerComponent implements OnInit {
       public_key: new FormControl('' ),
       post_up: new FormControl(''),
       post_down: new FormControl(''),
+      read_only: new FormControl(''),
 
       // Unused on backend
       configuration: new FormControl(''),

@@ -10,7 +10,8 @@ export class ConfigService {
 
   public applicationName = 'WireGuard Manager';
 
-  constructor(private notify: NotifierService) { }
+  constructor(private notify: NotifierService) {
+  }
 
   public handleError(error: HttpErrorResponse) {
     if (error.error instanceof ErrorEvent) {

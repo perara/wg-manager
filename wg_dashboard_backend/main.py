@@ -1,10 +1,14 @@
 import logging
 import os
+import time
 
 import typing
 from sqlalchemy_utils import database_exists
 from starlette.middleware.base import BaseHTTPMiddleware
 
+import const
+import db.wireguard
+import db.api_key
 import middleware
 from database import engine, SessionLocal
 from routers.v1 import user, server, peer, wg
@@ -27,6 +31,8 @@ from migrate import DatabaseAlreadyControlledError
 from migrate.versioning.shell import main
 import models
 
+# Sleep the wait timer.
+time.sleep(const.INIT_SLEEP)
 
 app = FastAPI()
 app.add_middleware(BaseHTTPMiddleware, dispatch=middleware.db_session_middleware)
@@ -34,28 +40,29 @@ app.add_middleware(BaseHTTPMiddleware, dispatch=middleware.db_session_middleware
 _db: Session = SessionLocal()
 
 # Ensure database existence
+
 if not database_exists(engine.url):
     ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
     if not ADMIN_USERNAME:
-        raise RuntimeError("Database does not exist and no ADMIN_USERNAME is set")
+        raise RuntimeError("Database does not exist and the environment variable ADMIN_USERNAME is set")
 
     ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 
     if not ADMIN_PASSWORD:
-        raise RuntimeError("Database does not exist and no ADMIN_PASSWORD is set")
+        raise RuntimeError("Database does not exist and the environment variable ADMIN_PASSWORD is set")
 
     # Create database from metadata
     models.Base.metadata.create_all(engine)
 
     # Create default user
-    _db.add(models.User(
+    _db.merge(models.User(
         username=ADMIN_USERNAME,
         password=middleware.get_password_hash(ADMIN_PASSWORD),
         full_name="Admin",
         role="admin",
         email=""
     ))
-_db.commit()
+    _db.commit()
 
 
 # Do migrations
@@ -75,6 +82,14 @@ for s in servers:
     except Exception as e:
         print(e)
 
+if const.CLIENT:
+    script.wireguard.load_environment_clients(_db)
+
+if const.SERVER_INIT_INTERFACE is not None:
+    db.wireguard.server_add_on_init(_db)
+
+if const.SERVER_STARTUP_API_KEY is not None:
+    db.api_key.add_initial_api_key_for_admin(_db, const.SERVER_STARTUP_API_KEY)
 _db.close()
 
 

@@ -33,58 +33,7 @@ def add_interface(
         sess: Session = Depends(middleware.get_db)
 ):
 
-    # Configure POST UP with defaults if not manually set.
-    if server.post_up == "":
-        server.post_up = const.DEFAULT_POST_UP
-        if server.v6_address is not None:
-            server.post_up += const.DEFAULT_POST_UP_v6
-
-    # Configure POST DOWN with defaults if not manually set.
-    if server.post_down == "":
-        server.post_down = const.DEFAULT_POST_DOWN
-        if server.v6_address is not None:
-            server.post_down += const.DEFAULT_POST_DOWN_v6
-
-    peers = server.peers if server.peers else []
-
-    # Public/Private key
-    try:
-
-        if sess.query(models.WGServer)\
-                .filter(
-                    (models.WGServer.interface == server.interface) |
-                    (models.WGServer.address == server.address) |
-                    (models.WGServer.v6_address == server.v6_address)).count() != 0:
-            raise HTTPException(status_code=400, detail="The server interface or ip %s already exists in the database" % server.interface)
-
-        if not server.private_key:
-            keys = script.wireguard.generate_keys()
-            server.private_key = keys["private_key"]
-            server.public_key = keys["public_key"]
-
-        server.configuration = script.wireguard.generate_config(server)
-        server.peers = []
-        server.sync(sess)
-
-        if len(peers) > 0:
-            server.from_db(sess)
-
-            for schemaPeer in peers:
-                schemaPeer.server_id = server.id
-                schemaPeer.configuration = script.wireguard.generate_config(dict(
-                    peer=schemaPeer,
-                    server=server
-                ))
-                dbPeer = models.WGPeer(**schemaPeer.dict())
-                sess.add(dbPeer)
-                sess.commit()
-
-        server.from_db(sess)
-
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-    return server
+    return db.wireguard.server_add(server, sess)
 
 
 @router.post("/stop", response_model=schemas.WGServer)

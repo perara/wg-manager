@@ -101,4 +101,10 @@ export class ServerComponent implements OnInit {
       saveAs(content, `${this.server.interface}_${this.server.address}.zip`);
     });
   }
+
+  getEndpointFromConfig(config){
+    console.log(config)
+    let res = config.match("Endpoint = (.*)") // TODO handle whitespace
+    return res[1]
+  }
 }
