@@ -89,7 +89,8 @@ if const.SERVER_INIT_INTERFACE is not None:
     db.wireguard.server_add_on_init(_db)
 
 if const.SERVER_STARTUP_API_KEY is not None:
-    db.api_key.add_initial_api_key_for_admin(_db, const.SERVER_STARTUP_API_KEY, ADMIN_USERNAME=ADMIN_USERNAME)
+    ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
+    db.api_key.add_initial_api_key_for_admin(_db, const.SERVER_STARTUP_API_KEY, ADMIN_USERNAME)
 _db.close()
 
 

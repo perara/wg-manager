@@ -198,6 +198,10 @@ networks:
 | CLIENT_X_SERVER_INTERFACE | The wg-interface to create client on e.g"wg0". See docs          | string      |
 | CLIENT_X_API_KEY | A valid API-Key that is active on the server. Works well with SERVER_STARTUP_API_KEY | string |
 
+# Q&A
+I'm trying to start the device but recieve the message: `Perhaps ip6tables or your kernel needs to be upgraded.`.
+    Try: `modprobe ip6table_nat` on the host.
+
 # Showcase
 ![Illustration](docs/images/0.png)
 
