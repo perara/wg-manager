@@ -1,4 +1,5 @@
 import os
+from threading import Thread
 
 from script.obfuscate import BaseObfuscation, NotInstalledError
 import re
@@ -23,12 +24,24 @@ class GitNotInstalled(Exception):
 
 
 class ShapeShifterBase(BaseObfuscation):
+    MODES_SUPPORTED = ["server", "client"]
+    ALGORITHMS_SUPPORTED = ["obfs4"]
 
-    def __init__(self):
+    def __init__(self, mode, algorithm, wireguard_port=None, listen_port=None, client_replicant_port=None, client_options=None):
         super().__init__(
             binary_path=shapeshifter_binary,
-            algorithm="obfs4"
+            algorithm=algorithm
         )
+
+        assert mode in ShapeShifterBase.MODES_SUPPORTED, "%s is not a supported mode. Supported: %s" % (
+            mode, ShapeShifterBase.MODES_SUPPORTED
+        )
+
+        self._wireguard_port = wireguard_port
+        self._listen_port = listen_port
+        self._client_replicant_port = client_replicant_port
+        self._mode = mode
+        self._client_options = client_options
 
         self._go_version_min = (1, 14, 0)
 
@@ -94,6 +107,67 @@ class ShapeShifterBase(BaseObfuscation):
             except FileNotFoundError:
                 self._install_shapeshifter()
 
+    def start(self):
+
+        bind_command = "bindaddr" if self._mode == "server" else "proxylistenaddr"
+        bind_port = self._listen_port if self._mode == "server" else self._client_replicant_port
+        bind_value = f"127.0.0.1:{bind_port}"  # TODO
+        if self._mode == "server":
+            bind_value = self.algorithm + "-" + bind_value
+        connect_command = "orport" if self._mode == "server" else "target"
+        connect_port = self._wireguard_port if self._mode == "server" else self._listen_port
+
+        cmd = [
+            "-transparent",
+            "-udp",
+            f"-{self._mode}",
+            "-state", f"state",
+            f"-{connect_command}", f"127.0.0.1:{connect_port}",
+            "-transports", self.algorithm,
+            f"-{bind_command}", bind_value
+        ]
+
+        if self._mode == "client":
+            cmd.extend([
+                "-options", f"{self._client_options}"
+            ])
+
+        cmd.extend([
+            "-logLevel", "DEBUG",
+            "-enableLogging",
+        ])
+        print(*cmd)
+        output, code = self.execute(*cmd, stream=True, prefix=self._mode)
+        print(output, code)
+
+    def start_threaded(self):
+        t = Thread(target=self.start, args=())
+        t.start()
+        return t
+
 
 if __name__ == "__main__":
-    x = ShapeShifterBase()
+    import time
+    x = ShapeShifterBase(
+        mode="server",
+        algorithm="obfs2",
+        wireguard_port=3333,
+        listen_port=2222,
+    )
+    x.start_threaded()
+
+    time.sleep(1)
+
+    x = ShapeShifterBase(
+        mode="client",
+        algorithm="obfs2",
+        listen_port=2222,
+        client_replicant_port=1443,
+        client_options='{"cert": "BWvGMVn3C8daXai2Xo+If23XS94eztZE9Kbtykvy9x5ADWc6YCHdGlWQfDh1fzu7AhuTIA", "iat-mode": "0"}'
+    )
+    x.start_threaded()
+
+
+
+    while True:
+        time.sleep(1)

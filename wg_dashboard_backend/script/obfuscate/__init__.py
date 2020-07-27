@@ -1,6 +1,7 @@
 import abc
 from pathlib import Path
 import subprocess
+import shlex
 
 
 class NotInstalledError(Exception):
@@ -30,7 +31,9 @@ class BaseObfuscation(abc.ABC):
 
             self.binary_path = data
 
-    def execute(self, *args, kill_first=False, override_command=None):
+    def execute(self, *args, kill_first=False, override_command=None, stream=False, prefix=""):
+        if prefix != "":
+            prefix += ": "
 
         if kill_first:
             # TODO try to delete by full name as we dont want to kill other processes.
@@ -41,16 +44,27 @@ class BaseObfuscation(abc.ABC):
             #kill_output, kill_code = self.execute(*[pattern], override_command="pkill")
 
         command = override_command if override_command is not None else self.binary_path
-
         proc_which = subprocess.Popen([command] + list(args), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        raw_data = proc_which.communicate()
 
-        data = [x.decode().strip() for x in raw_data if x != b'']
-        if len(data) == 0:
-            data = ""
+        if not stream:
+            raw_data = proc_which.communicate()
+
+            data = [x.decode().strip() for x in raw_data if x != b'']
+            if len(data) == 0:
+                data = ""
+            else:
+                data = data[0]
+            return data, proc_which.returncode
+
         else:
-            data = data[0]
-        return data, proc_which.returncode
+            while True:
+                output = proc_which.stdout.readline()
+                if output == '' and proc_which.poll() is not None:
+                    break
+                if output:
+                    print(prefix + output.strip().decode())
+            rc = proc_which.poll()
+            return rc
 
 
 
