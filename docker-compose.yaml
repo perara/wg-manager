@@ -50,6 +50,7 @@ services:
       CLIENT: 1  # If you want to connect to servers
       CLIENT_START_AUTOMATICALLY: 1  # If you want the client to start automatically
       CLIENT_1_NAME: "client-1"   # Name of first client
+      CLIENT_1_ROUTES: "10.0.200.0/24"
       CLIENT_1_SERVER_HOST: "http://server:8888"  # Endpoint of first server
       CLIENT_1_SERVER_INTERFACE: "wg0"  # Interface of first server (to get config)
       CLIENT_1_API_KEY: "thisisasecretkeythatnobodyknows"  # API-Key of first server (to get config)
