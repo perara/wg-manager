@@ -1,10 +1,10 @@
 [Interface]
-Address = {{ data.address }}
+Address = {{ data.address }}/{{ data.subnet }}{%- if is_ipv6 -%},{{ data.v6_address }}/{{ data.v6_subnet }}{%- endif %}
 ListenPort = {{ data.listen_port }}
 PrivateKey = {{ data.private_key }}
 
-PostUp = {{ data.post_up }}
-PostDown = {{ data.post_down }}
+PostUp = {{ data.post_up }}{%- if is_ipv6 -%} {{ data.v6_post_up }}{%- endif %}
+PostDown = {{ data.post_down }}{%- if is_ipv6 -%} {{ data.v6_post_down }}{%- endif %}
 
 {% for peer in data.peers %}
 [Peer]
@@ -13,5 +13,5 @@ PublicKey = {{ peer.public_key }}
 {%- if peer.shared_key %}
 PresharedKey = {{ peer.shared_key }}
 {%- endif %}
-AllowedIPs = {{ peer.address }}
+AllowedIPs = {{ peer.address }}/32{%- if is_ipv6 -%},{{ peer.v6_address }}/128{%- endif %}
 {% endfor %}

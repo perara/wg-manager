@@ -1,0 +1,62 @@
+version: "2.1"
+services:
+
+  server:
+    container_name: wg-manager
+    build: .
+    restart: always
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: 0
+    cap_add:
+      - NET_ADMIN
+    #network_mode: host # Alternatively
+    ports:
+      - 11820:11820/udp
+      - 51800-51900:51800-51900/udp
+      - 8888:8888
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8888
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: admin
+      WEB_CONCURRENCY: 2
+      SERVER_INIT_INTERFACE_START: 1
+
+      #endpoint dynamic variables: ||external|| , ||internal||
+      SERVER_INIT_INTERFACE: '{"address":"10.0.200.1","v6_address":"fd42:42:42::1","subnet":24,"v6_subnet":64,"interface":"wg0","listen_port":"51820","endpoint":"server","dns":"10.0.200.1,8.8.8.8","private_key":"","public_key":"","post_up":"","post_down":"","configuration":"","is_running":false,"peers":[]}'
+      SERVER_STARTUP_API_KEY: thisisasecretkeythatnobodyknows
+    networks:
+      - wg-manager-net
+
+  client:
+    container_name: wg-manager-server-with-client
+    build: .
+    restart: always
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: 0
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - 8889:8889
+    privileged: true
+    environment:
+      HOST: 0.0.0.0  # Optional (For Accessing WEB-Gui)
+      PORT: 8889  # Optional (Web-GUI Listen Port)
+      WEB_CONCURRENCY: 1  # Optional
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: admin
+      INIT_SLEEP: 5  # If you run into concurrency issues
+      SERVER: 0  # If you want to host a server as well
+      CLIENT: 1  # If you want to connect to servers
+      CLIENT_START_AUTOMATICALLY: 1  # If you want the client to start automatically
+      CLIENT_1_NAME: "client-1"   # Name of first client
+      CLIENT_1_ROUTES: "10.0.200.0/24"
+      CLIENT_1_SERVER_HOST: "http://server:8888"  # Endpoint of first server
+      CLIENT_1_SERVER_INTERFACE: "wg0"  # Interface of first server (to get config)
+      CLIENT_1_API_KEY: "thisisasecretkeythatnobodyknows"  # API-Key of first server (to get config)
+    networks:
+      - wg-manager-net
+
+networks:
+  wg-manager-net:
+    driver: bridge

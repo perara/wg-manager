@@ -40,22 +40,22 @@ export class LayoutComponent implements OnInit {
     public auth: AuthService,
     private comm: DataService,
     private cookieService: CookieService
-  ) {}
-  ngOnInit(): void {
-    console.log('Layout');
+  ) {
+    this.darkMode = (this.cookieService.get("darkMode") === 'true');
 
     if(this.cookieService.check("currentTheme")){
       this.currentTheme = JSON.parse(this.cookieService.get("currentTheme"));
-      this.darkMode = (this.cookieService.get("darkMode") === 'true');
     }else {
       this.currentTheme = { ... this.themes[0]}
     }
+    this.sendData()
 
   }
+  ngOnInit(): void {
+    console.log('Layout');
+  }
 
-  toggleDarkMode($event){
-    $event.stopPropagation();
-    this.darkMode = !this.darkMode;
+  toggleDarkMode(){
     this.cookieService.set("darkMode", String(this.darkMode));
     this.sendData();
   }

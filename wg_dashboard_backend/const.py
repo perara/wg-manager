@@ -5,17 +5,35 @@ IS_DOCKER = os.getenv("IS_DOCKER", "False") == "True"
 DATABASE_FILE = "/config/database.db" if IS_DOCKER else "./database.db"
 DATABASE_URL = f"sqlite:///{DATABASE_FILE}"
 
-os.makedirs("build", exist_ok=True)
+OBFUSCATE_ENABLED = os.getenv("OBFUSCATION", "True") == "True"  # TODO should be false by default
+OBFUSCATE_MODE = os.getenv("OBFUSCATION_MODE", "obfs4")
+OBFUSCATE_SOCKS_TOR_PORT = int(os.getenv("OBFUSCATE_SOCKS_TOR_PORT", "5555"))
+OBFUSCATE_TOR_LISTEN_ADDR = int(os.getenv("OBFUSCATE_TOR_LISTEN_ADDR", "5556"))
+OBFUSCATE_SUPPORTED = ["obfs4"]
+assert OBFUSCATE_MODE in OBFUSCATE_SUPPORTED, "Invalid OBFUSCATE_MODE=%s, Valid options are: %s" % (OBFUSCATE_MODE,
+                                                                                                    OBFUSCATE_SUPPORTED)
 
-DEFAULT_POST_UP = os.getenv("POST_UP", "iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE")
-DEFAULT_POST_DOWN = os.getenv("POST_DOWN", "iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE")
+os.makedirs("build", exist_ok=True)
+DEFAULT_POST_UP = os.getenv("POST_UP", "iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE;")
+DEFAULT_POST_DOWN = os.getenv("POST_DOWN", "iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE;")
+DEFAULT_POST_UP_v6 = os.getenv("POST_UP_V6", "ip6tables -A FORWARD -i %i -j ACCEPT; ip6tables -t nat -A POSTROUTING -o eth0 -j MASQUERADE;")
+DEFAULT_POST_DOWN_v6 = os.getenv("POST_DOWN_V6", "ip6tables -D FORWARD -i %i -j ACCEPT; ip6tables -t nat -D POSTROUTING -o eth0 -j MASQUERADE;")
 
 SECRET_KEY = ''.join(random.choices(string.ascii_uppercase + string.digits, k=64))
 ALGORITHM = "HS256"
 
+API_KEY_LENGTH = 32
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 CMD_WG_COMMAND = ["wg"]
 CMD_WG_QUICK = ["wg-quick"]
+
+INIT_SLEEP = int(os.getenv("INIT_SLEEP", "0"))
+SERVER_STARTUP_API_KEY = os.getenv("SERVER_STARTUP_API_KEY", None)
+SERVER_INIT_INTERFACE = os.getenv("SERVER_INIT_INTERFACE", None)
+SERVER_INIT_INTERFACE_START = os.getenv("SERVER_INIT_INTERFACE_START", "1") == "1"
+SERVER = os.getenv("SERVER", "1") == "1"
+CLIENT = os.getenv("CLIENT", "0") == "1"
+CLIENT_START_AUTOMATICALLY = os.getenv("CLIENT_START_AUTOMATICALLY", "1") == "1"
 
 if not IS_DOCKER:
     CMD_WG_COMMAND = ["sudo"] + CMD_WG_COMMAND

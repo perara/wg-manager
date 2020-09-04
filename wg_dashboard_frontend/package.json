@@ -8,6 +8,7 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
+    "md-doc": "npm install widdershins && wget http://127.0.0.1:8000/openapi.json -O /tmp/wg-openapi.json && widdershins /tmp/wg-openapi.json --environment widdershins.json --resolve=true --omitHeader=true --language_tabs 'python:Python' -o ../docs/api.md",
     "start": "ng serve --host 0.0.0.0 --disable-host-check",
     "build": "ng build",
     "buildwatch": "ng build --watch --aot --outputPath=../wg_dashboard_backend/build/ --host 0.0.0.0 --disable-host-check",
@@ -59,6 +60,7 @@
     "rxjs": "6.5.5",
     "tslib": "^1.10.0",
     "web-animations-js": "^2.3.2",
+    "widdershins": "^4.0.1",
     "zone.js": "^0.10.3"
   },
   "devDependencies": {

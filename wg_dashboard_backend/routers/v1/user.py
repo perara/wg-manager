@@ -1,9 +1,12 @@
+import os
 from datetime import timedelta
 
-from fastapi import APIRouter, HTTPException, Depends, Form
+from fastapi import APIRouter, HTTPException, Depends, Form, Body
+from fastapi.responses import PlainTextResponse, JSONResponse
+import typing
 from sqlalchemy.orm import Session
 from starlette import status
-
+from binascii import hexlify
 import const
 import db.user
 import middleware
@@ -26,6 +29,51 @@ def edit(form_data: schemas.UserInDB,
     form_data.password = middleware.get_password_hash(form_data.password)
     form_data.sync(sess)
     return form_data
+
+
+@router.get("/users/api-key/add", response_model=schemas.UserAPIKeyFull)
+def add_api_key(
+        user: schemas.UserInDB = Depends(middleware.auth),
+        sess: Session = Depends(middleware.get_db)
+):
+    key = hexlify(os.urandom(const.API_KEY_LENGTH)).decode()
+
+    api_key = models.UserAPIKey(
+        user_id=user.id,
+        key=key,
+    )
+    sess.add(api_key)
+    sess.commit()
+
+    return schemas.UserAPIKeyFull.from_orm(api_key)
+
+
+@router.post("/users/api-key/delete")
+def delete_api_keys(
+        key_id: int = Body(None, embed=True),
+        user: schemas.UserInDB = Depends(middleware.auth),
+        sess: Session = Depends(middleware.get_db)
+):
+
+    count = sess.query(models.UserAPIKey)\
+        .filter_by(id=key_id)\
+        .delete()
+    sess.commit()
+
+    return JSONResponse({
+        "message": "Key deleted OK" if count == 1 else "There was an error while deleting the api-key"
+    })
+
+
+@router.get("/users/api-key/list", response_model=typing.List[schemas.UserAPIKey])
+def get_api_keys(
+        user: schemas.UserInDB = Depends(middleware.auth),
+        sess: Session = Depends(middleware.get_db)
+):
+    keys = [schemas.UserAPIKey.from_orm(x) for x in sess.query(models.UserAPIKey)
+            .filter(models.UserAPIKey.user_id == user.id).all()]
+
+    return keys
 
 
 @router.post("/login", response_model=schemas.Token)
@@ -77,10 +125,3 @@ def create_user(
                 role=form_data.role,
         )):
             raise HTTPException(status_code=400, detail="Could not create user")
-
-    return login_for_access_token(OAuth2PasswordRequestForm(
-        username=form_data.username,
-        password=form_data.password,
-        scope=""
-    ), sess)
-

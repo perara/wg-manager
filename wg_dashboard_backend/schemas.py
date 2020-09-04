@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pydantic
 from pydantic import BaseModel, typing
 from sqlalchemy.orm import Session, Query
@@ -100,6 +102,15 @@ class User(GenericModel):
         excludes = {"id"}
 
 
+class UserAPIKey(GenericModel):
+    id: int
+    created_date: datetime
+
+
+class UserAPIKeyFull(UserAPIKey):
+    key: str
+
+
 class UserInDB(User):
     password: str
 
@@ -114,6 +125,7 @@ class WGPeer(GenericModel):
     id: int = None
     name: str = None
     address: str = None
+    v6_address: str = None
     private_key: str = None
     public_key: str = None
     shared_key: str = None
@@ -124,8 +136,8 @@ class WGPeer(GenericModel):
 
     class Meta:
         model = models.WGPeer
-        key = "address"
-        excludes = {"id"}
+        key = "id"
+        excludes = {}
 
 
 class WGPeerConfig(GenericModel):
@@ -144,6 +156,9 @@ class PSK(GenericModel):
 class WGServer(GenericModel):
     id: int = None
     address: str = None
+    v6_address: str = None
+    subnet: int = None
+    v6_subnet: int = None
     interface: str
     listen_port: int = None
     endpoint: str = None
@@ -154,6 +169,7 @@ class WGServer(GenericModel):
     post_up: str = None
     post_down: str = None
     dns: str = None
+    read_only: int = None
 
     peers: pydantic.typing.List['WGPeer'] = []
 
@@ -173,6 +189,11 @@ class WGServerAdd(WGServer):
     listen_port: int
 
 
-class WGPeerAdd(GenericModel):
+class WGPeerConfigAdd(GenericModel):
     server_interface: str
+    name: str = None
 
+
+class WGPeerConfigGetByName(GenericModel):
+    server_interface: str
+    name: str = None

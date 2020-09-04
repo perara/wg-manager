@@ -1,15 +1,16 @@
-import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import {Component, Input, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { IPValidator } from '../../../validators/ip-address.validator';
 import { NumberValidator } from '../../../validators/number.validator';
 import { Server } from '../../../interfaces/server';
 import { ServerService } from '../../../services/server.service';
 import { DataService } from '../../../services/data.service';
-import Parser, {Property, Section, Sections} from "@jedmao/ini-parser";
+import Parser, {Section} from "@jedmao/ini-parser";
 import {Peer} from "../../../interfaces/peer";
-import {forkJoin, from, Observable, of} from "rxjs";
-import {concatAll, concatMap, filter, map, mergeAll, mergeMap, switchMap} from "rxjs/operators";
+import {forkJoin, from} from "rxjs";
+import {map, mergeMap} from "rxjs/operators";
 import {NotifierService} from "angular-notifier";
+import {MatCheckboxChange} from "@angular/material/checkbox";
 @Component({
   selector: 'app-add-server',
   templateUrl: './add-server.component.html',
@@ -34,21 +35,36 @@ export class AddServerComponent implements OnInit {
     "DNS": "dns"
   }
 
+  v4Subnets = [];
+  v6Subnets = [];
+  defaultListenPort = "51820"
+  defaultInterface = "wg0"
+  defaultIPv4Subnet = 24;
+  defaultIPv6Subnet = 64;
+  defaultIPv4Address = "10.0.200.1"
+  defaultDNS = this.defaultIPv4Address + ",8.8.8.8"
+  defaultIPv6Address = "fd42:42:42::1"
+
+
   serverForm: FormGroup = null;
   isEdit = false;
   editServer: Server = null;
 
   initForm(){
     this.serverForm = new FormGroup({
-      address: new FormControl('', [IPValidator.isIPAddress]),
-      interface: new FormControl('', [Validators.required, Validators.minLength(3)]),
-      listen_port: new FormControl('', [Validators.required, NumberValidator.stringIsNumber]),
+      address: new FormControl(this.defaultIPv4Address, [Validators.required, IPValidator.isIPAddress]),
+      v6_address: new FormControl(this.defaultIPv6Address, [Validators.required, IPValidator.isIPAddress]),
+      subnet: new FormControl(this.defaultIPv4Subnet, [Validators.required, Validators.min(1), Validators.max(32)]),
+      v6_subnet: new FormControl(this.defaultIPv6Subnet, [Validators.required, Validators.min(1), Validators.max(64)]),
+      interface: new FormControl(this.defaultInterface, [Validators.required, Validators.minLength(3)]),
+      listen_port: new FormControl(this.defaultListenPort, [Validators.required, NumberValidator.stringIsNumber]),
       endpoint: new FormControl('', Validators.required),
-      dns: new FormControl(''),
+      dns: new FormControl(this.defaultDNS),
       private_key: new FormControl('' ),
       public_key: new FormControl('' ),
       post_up: new FormControl(''),
       post_down: new FormControl(''),
+      read_only: new FormControl(''),
 
       // Unused on backend
       configuration: new FormControl(''),
@@ -57,11 +73,25 @@ export class AddServerComponent implements OnInit {
     });
   }
 
+  ipv6SupportChanged($event: MatCheckboxChange){
+    let v6AddressControl = this.serverForm.get("v6_address");
+    let v6SubnetControl = this.serverForm.get("v6_subnet");
+    if($event.checked){
+      v6AddressControl.enable()
+      v6SubnetControl.enable()
+    }else {
+      v6AddressControl.disable()
+      v6SubnetControl.disable()
+    }
+  }
+
   constructor(private serverAPI: ServerService, private comm: DataService, private notify: NotifierService) {
 
   }
 
   ngOnInit(): void {
+    this.v4Subnets = Array(32).fill(1).map((x,i)=>i+1);
+    this.v6Subnets = Array(64).fill(1).map((x,i)=>i+1);
     this.initForm();
 
     this.comm.on('server-edit').subscribe((data: Server) => {
@@ -140,11 +170,14 @@ export class AddServerComponent implements OnInit {
       return false;
     }
 
+    iFace.nodes["subnet"] = iFace.nodes["address"].split("/")[1];
+    iFace.nodes["address"] = iFace.nodes["address"].split("/")[0];
+
     iFace.nodes["peers"] = sPeers
       .map( x => x.nodes)
       .map( x => {
       x.server_id = -1;
-      x.address = x.allowed_ips;  // Allowed_ips in server is the address of the peer (Seen from server perspective)
+      x.address = x.allowed_ips.split("/")[0];  // Allowed_ips in server is the address of the peer (Seen from server perspective)
       x.allowed_ips = null;  // This should be retrieved from peer data config
       return x;
     })
@@ -200,10 +233,9 @@ export class AddServerComponent implements OnInit {
       });
     }
 
-    this.isEdit = false;
-    this.editServer = null;
-    this.serverForm.reset();
-    this.serverForm.clearValidators();
+
+    this.resetForm();
+
   }
 
   getKeyPair() {
@@ -220,7 +252,7 @@ export class AddServerComponent implements OnInit {
   resetForm() {
     this.isEdit = false;
     this.editServer = null;
-
+    this.serverForm.clearValidators();
     this.initForm()
   }
 }

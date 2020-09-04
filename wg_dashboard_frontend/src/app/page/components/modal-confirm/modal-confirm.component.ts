@@ -37,6 +37,7 @@ export class ModalConfirmComponent implements OnInit {
   }
 
   open($event){
+    $event.stopPropagation();
     if (this.noConfirm) {
       this.onConfirm.emit($event);
       return true;
@@ -54,6 +55,7 @@ export class ModalConfirmComponent implements OnInit {
   }
 
   cancel($event){
+    $event.stopPropagation();
     this.onCancel.emit($event);
     this.shown = false
   }

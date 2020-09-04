@@ -4,7 +4,7 @@ import * as IPCIDR from 'ip-cidr';
 export class IPValidator {
 
   static isIPAddress(control: AbstractControl): ValidationErrors | null {
-    if (!control.value  || !(new IPCIDR(control.value).isValid()) || !control.value.includes('/')) {
+    if (!control.value  || !(new IPCIDR(control.value).isValid())) {
       return { validIP: true };
     }
     return null;

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit } from '@angular/core';
 import { Server } from '../../../interfaces/server';
 import { ServerService } from '../../../services/server.service';
 import { DataService } from '../../../services/data.service';
@@ -47,6 +47,9 @@ export class ServerComponent implements OnInit {
       server_interface: this.server.interface
     }).subscribe((peer) => {
       this.server.peers.push(peer);
+
+      // Query server for server configuration update
+      this.onPeerUpdate();
     });
   }
 
@@ -58,7 +61,7 @@ export class ServerComponent implements OnInit {
 
   delete() {
     const index = this.servers.indexOf(this.server);
-    this.serverAPI.deleteServer(this.server).subscribe((apiServer) => {
+    this.serverAPI.deleteServer(this.server).subscribe(() => {
       this.servers.splice(index, 1);
     });
   }
@@ -70,6 +73,12 @@ export class ServerComponent implements OnInit {
     }
     this.selectedPeer = peer;
     this.editPeerEmitter.emit({ type: 'open', peer });
+  }
+
+  onPeerUpdate(){
+    this.serverAPI.serverConfig(this.server).subscribe((configuration) => {
+      this.server.configuration = configuration
+    })
   }
 
   pInt(string: string) {
@@ -91,5 +100,11 @@ export class ServerComponent implements OnInit {
     zip.generateAsync({type:"blob"}).then((content) => {
       saveAs(content, `${this.server.interface}_${this.server.address}.zip`);
     });
+  }
+
+  getEndpointFromConfig(config){
+    console.log(config)
+    let res = config.match("Endpoint = (.*)") // TODO handle whitespace
+    return res[1]
   }
 }

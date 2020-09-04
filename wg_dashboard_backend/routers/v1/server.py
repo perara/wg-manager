@@ -32,44 +32,8 @@ def add_interface(
         server: schemas.WGServerAdd,
         sess: Session = Depends(middleware.get_db)
 ):
-    server.post_up = server.post_up if server.post_up != "" else const.DEFAULT_POST_UP
-    server.post_down = server.post_up if server.post_up != "" else const.DEFAULT_POST_DOWN
-    peers = server.peers if server.peers else []
 
-    # Public/Private key
-    try:
-
-        if server.filter_query(sess).count() != 0:
-            raise HTTPException(status_code=400, detail="The server interface %s already exists in the database" % server.interface)
-
-        if not server.private_key:
-            keys = script.wireguard.generate_keys()
-            server.private_key = keys["private_key"]
-            server.public_key = keys["public_key"]
-
-        server.configuration = script.wireguard.generate_config(server)
-        server.peers = []
-        server.sync(sess)
-
-        if len(peers) > 0:
-            server.from_db(sess)
-
-            for schemaPeer in peers:
-                schemaPeer.server_id = server.id
-                schemaPeer.configuration = script.wireguard.generate_config(dict(
-                    peer=schemaPeer,
-                    server=server
-                ))
-                dbPeer = models.WGPeer(**schemaPeer.dict())
-                sess.add(dbPeer)
-                sess.commit()
-
-        server.from_db(sess)
-
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-    return server
+    return db.wireguard.server_add(server, sess)
 
 
 @router.post("/stop", response_model=schemas.WGServer)
@@ -122,7 +86,11 @@ def delete_server(
 
 @router.post("/stats", dependencies=[Depends(middleware.auth)])
 def stats_server(server: schemas.WGServer):
-    stats = script.wireguard.get_stats(server)
+    if script.wireguard.is_running(server):
+        stats = script.wireguard.get_stats(server)
+    else:
+        stats = []
+
     return JSONResponse(content=stats)
 
 
@@ -149,12 +117,23 @@ def edit_server(
             peer=peer,
             server=server
         ))
-        peer.sync(sess)
+
+        db_peer = models.WGPeer(**peer.dict())
+        sess.merge(db_peer)
+        sess.commit()
 
     script.wireguard.start_interface(server)
     server.is_running = script.wireguard.is_running(server)
-    server.sync(sess)
+    server.sync(sess)  # TODO - fix this sync mess.
     server.from_db(sess)
 
     return server
 
+
+@router.get("/config/{server_id}", response_model=str)
+def server_config(
+        server_id: int,
+        sess: Session = Depends(middleware.get_db)
+):
+
+    return db.wireguard.get_server_by_id(sess, server_id=server_id).configuration

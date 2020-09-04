@@ -11,15 +11,15 @@ MAINTAINER per@sysx.no
 ENV IS_DOCKER True
 WORKDIR /app
 # Install dependencies
-RUN apk add --no-cache --update wireguard-tools py3-gunicorn python3 py3-pip
+RUN apk add --no-cache --update wireguard-tools py3-gunicorn python3 py3-pip ip6tables
 
 COPY wg_dashboard_backend /app
-
+ENV LIBRARY_PATH=/lib:/usr/lib
 # Install dependencies
-RUN apk add --no-cache build-base python3-dev libffi-dev && \
+RUN apk add --no-cache build-base python3-dev libffi-dev jpeg-dev zlib-dev && \
 pip3 install uvicorn && \
 pip3 install -r requirements.txt && \
-apk del build-base python3-dev libffi-dev
+apk del build-base python3-dev libffi-dev jpeg-dev zlib-dev
 
 # Copy startup scripts
 COPY docker/ ./startup
