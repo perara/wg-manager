@@ -1,12 +1,15 @@
-FROM node
+FROM node:14-alpine
 
 COPY ./wg_dashboard_frontend /tmp/build
 WORKDIR /tmp/build
-RUN npm install && npm install -g @angular/cli
+RUN apk add --no-cache build-base python3-dev && \
+npm install && npm install -g @angular/cli && \
+rm -rf node_modules && \ 
+apk del build-base python3-dev
 RUN ng build --configuration="production"
 
 
-FROM alpine:latest
+FROM alpine:3.12
 MAINTAINER per@sysx.no
 ENV IS_DOCKER True
 WORKDIR /app
