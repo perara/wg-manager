@@ -6,7 +6,7 @@ RUN npm install && npm install -g @angular/cli
 RUN ng build --configuration="production"
 
 
-FROM alpine:latest
+FROM alpine:3.12
 MAINTAINER per@sysx.no
 ENV IS_DOCKER True
 WORKDIR /app
