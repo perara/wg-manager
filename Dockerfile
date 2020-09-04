@@ -1,4 +1,4 @@
-FROM node
+FROM node:current-alpine3.12
 
 COPY ./wg_dashboard_frontend /tmp/build
 WORKDIR /tmp/build
