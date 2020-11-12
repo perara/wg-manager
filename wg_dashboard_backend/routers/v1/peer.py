@@ -64,8 +64,7 @@ def add_peer(
     peer.private_key = keys["private_key"]
     peer.public_key = keys["public_key"]
 
-    # Set 0.0.0.0/0, ::/0 as default allowed ips
-    peer.allowed_ips = ', '.join(const.PEER_DEFAULT_ALLOWED_IPS)
+    peer.allowed_ips = server.allowed_ips
 
     # Set unnamed
     peer.name = "Unnamed" if not peer_add.name else peer_add.name

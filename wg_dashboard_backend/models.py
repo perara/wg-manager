@@ -41,6 +41,7 @@ class WGServer(Base):
     public_key = Column(sqlalchemy.String)
     endpoint = Column(sqlalchemy.String)
     dns = Column(sqlalchemy.String)
+    allowed_ips = Column(sqlalchemy.String)
     read_only = Column(sqlalchemy.Integer, default=0)
 
     post_up = Column(sqlalchemy.String)
