@@ -226,17 +226,16 @@ export class AddServerComponent implements OnInit {
       const idx = this.servers.indexOf(this.editServer);
       this.serverAPI.editServer(this.editServer, form).subscribe((server: Server) => {
         this.servers[idx] = server;
+        this.resetForm();
       });
 
     } else {
 
       this.serverAPI.addServer(form).subscribe((server: Server) => {
         this.servers.push(server);
+        this.resetForm();
       });
     }
-
-
-    this.resetForm();
 
   }
 
