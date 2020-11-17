@@ -42,7 +42,7 @@ class WGServer(Base):
     endpoint = Column(sqlalchemy.String)
     dns = Column(sqlalchemy.String)
     allowed_ips = Column(sqlalchemy.String)
-    keep_alive = Column(sqlalchemy.String)
+    keep_alive = Column(sqlalchemy.Integer, default=0)
     read_only = Column(sqlalchemy.Integer, default=0)
 
     post_up = Column(sqlalchemy.String)
@@ -65,7 +65,7 @@ class WGPeer(Base):
     shared_key = Column(sqlalchemy.Text)
     dns = Column(sqlalchemy.Text)
     allowed_ips = Column(sqlalchemy.String)
-    keep_alive = Column(sqlalchemy.String)
+    keep_alive = Column(sqlalchemy.Integer, default=0)
     read_only = Column(sqlalchemy.Integer, default=0)
 
     server_id = Column(Integer, sqlalchemy.ForeignKey('server.id', ondelete="CASCADE", onupdate="CASCADE"))

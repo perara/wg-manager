@@ -45,7 +45,7 @@ export class AddServerComponent implements OnInit {
   defaultDNS = this.defaultIPv4Address + ",8.8.8.8"
   defaultIPv6Address = "fd42:42:42::1"
   defaultAllowedIPs = "0.0.0.0/0, ::/0"
-  defaultPersistentKeepalive = "0"
+  defaultPersistentKeepalive = 0;
 
 
   serverForm: FormGroup = null;

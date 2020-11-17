@@ -6,7 +6,7 @@ def upgrade(migrate_engine):
     try:
         meta = MetaData(bind=migrate_engine)
         server = Table('server', meta, autoload=True)
-        keep_alive = Column('keep_alive', Text)
+        keep_alive = Column('keep_alive', Integer)
         keep_alive.create(server)
     except:
         pass
