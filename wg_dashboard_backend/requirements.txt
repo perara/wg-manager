@@ -13,4 +13,6 @@ sqlalchemy_utils
 sqlalchemy-migrate
 requests
 uvicorn
+uvloop
+httptools
 qrcode[pil]
