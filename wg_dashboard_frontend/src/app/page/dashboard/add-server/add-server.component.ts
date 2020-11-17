@@ -45,6 +45,7 @@ export class AddServerComponent implements OnInit {
   defaultDNS = this.defaultIPv4Address + ",8.8.8.8"
   defaultIPv6Address = "fd42:42:42::1"
   defaultAllowedIPs = "0.0.0.0/0, ::/0"
+  defaultPersistentKeepalive = "0"
 
 
   serverForm: FormGroup = null;
@@ -62,6 +63,7 @@ export class AddServerComponent implements OnInit {
       endpoint: new FormControl('', Validators.required),
       dns: new FormControl(this.defaultDNS),
       allowed_ips: new FormControl(this.defaultAllowedIPs),
+      keep_alive: new FormControl(this.defaultPersistentKeepalive),
       private_key: new FormControl('' ),
       public_key: new FormControl('' ),
       post_up: new FormControl(''),

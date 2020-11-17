@@ -7,6 +7,7 @@ export interface Peer {
   shared_key: string;
   dns: string;
   allowed_ips: string;
+  keep_alive: string;
   name: string;
   configuration: string;
   stats: {

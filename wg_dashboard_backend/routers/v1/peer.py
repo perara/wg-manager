@@ -65,6 +65,7 @@ def add_peer(
     peer.public_key = keys["public_key"]
 
     peer.allowed_ips = server.allowed_ips
+    peer.keep_alive = server.keep_alive
 
     # Set unnamed
     peer.name = "Unnamed" if not peer_add.name else peer_add.name

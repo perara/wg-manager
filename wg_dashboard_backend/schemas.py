@@ -132,6 +132,7 @@ class WGPeer(GenericModel):
     server_id: str
     dns: str = None
     allowed_ips: str = None
+    keep_alive: str = None
     configuration: str = None
 
     class Meta:
@@ -170,6 +171,7 @@ class WGServer(GenericModel):
     post_down: str = None
     dns: str = None
     allowed_ips: str = None
+    keep_alive: str = None
     read_only: int = None
 
     peers: pydantic.typing.List['WGPeer'] = []
