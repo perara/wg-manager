@@ -44,6 +44,8 @@ export class AddServerComponent implements OnInit {
   defaultIPv4Address = "10.0.200.1"
   defaultDNS = this.defaultIPv4Address + ",8.8.8.8"
   defaultIPv6Address = "fd42:42:42::1"
+  defaultAllowedIPs = "0.0.0.0/0, ::/0"
+  defaultPersistentKeepalive = 0;
 
 
   serverForm: FormGroup = null;
@@ -60,11 +62,13 @@ export class AddServerComponent implements OnInit {
       listen_port: new FormControl(this.defaultListenPort, [Validators.required, NumberValidator.stringIsNumber]),
       endpoint: new FormControl('', Validators.required),
       dns: new FormControl(this.defaultDNS),
+      allowed_ips: new FormControl(this.defaultAllowedIPs),
+      keep_alive: new FormControl(this.defaultPersistentKeepalive),
       private_key: new FormControl('' ),
       public_key: new FormControl('' ),
       post_up: new FormControl(''),
       post_down: new FormControl(''),
-      read_only: new FormControl(''),
+      read_only: new FormControl(0),
 
       // Unused on backend
       configuration: new FormControl(''),
@@ -224,17 +228,16 @@ export class AddServerComponent implements OnInit {
       const idx = this.servers.indexOf(this.editServer);
       this.serverAPI.editServer(this.editServer, form).subscribe((server: Server) => {
         this.servers[idx] = server;
+        this.resetForm();
       });
 
     } else {
 
       this.serverAPI.addServer(form).subscribe((server: Server) => {
         this.servers.push(server);
+        this.resetForm();
       });
     }
-
-
-    this.resetForm();
 
   }
 
