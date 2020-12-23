@@ -41,7 +41,7 @@ The features of wg-manager includes:
 3. It is recommended to have a firewall protecting your servers
 
 ## Notes
-* A few people has experienced issues with running the dockerized method using bridged networking. To fix this, you can use `network_mode: host`. Note that you can no longer reverse-proxy the web interface from reverse proxies such as [jwilder/nginx-proxy](https://hub.docker.com/r/jwilder/nginx-proxy/).
+* A few people has experienced issues with running the dockerized method using bridged networking. To workaround this, you can use `network_mode: host`. Note that you can no longer reverse-proxy the web interface from reverse proxies such as [jwilder/nginx-proxy](https://hub.docker.com/r/jwilder/nginx-proxy/).
 
 ## Method #1: Docker-compose
 ```yaml
