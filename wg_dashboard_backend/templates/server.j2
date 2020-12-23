@@ -3,8 +3,12 @@ Address = {{ data.address }}/{{ data.subnet }}{%- if is_ipv6 -%},{{ data.v6_addr
 ListenPort = {{ data.listen_port }}
 PrivateKey = {{ data.private_key }}
 
+{% if data.post_up or data.v6_post_up %}
 PostUp = {{ data.post_up }}{%- if is_ipv6 -%} {{ data.v6_post_up }}{%- endif %}
+{%- endif %}
+{% if data.post_down or data.v6_post_down %}
 PostDown = {{ data.post_down }}{%- if is_ipv6 -%} {{ data.v6_post_down }}{%- endif %}
+{%- endif %}
 
 {% for peer in data.peers %}
 [Peer]
