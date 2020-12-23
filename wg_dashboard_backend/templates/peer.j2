@@ -9,6 +9,5 @@ DNS = {{ data.peer.dns }}
 PublicKey = {{ data.server.public_key }}
 AllowedIPs = {{ data.peer.allowed_ips }}
 Endpoint = {{ data.server.endpoint }}:{{ data.server.listen_port }}
-{% if data.peer.shared_key %}
-PresharedKey = {{ data.peer.shared_key }}
-{% endif %}
+{% if data.peer.shared_key %}PresharedKey = {{ data.peer.shared_key }}{% endif %}
+{% if data.peer.keep_alive %}PersistentKeepalive = {{data.peer.keep_alive}}{% endif %}
