@@ -9,7 +9,7 @@ rm -rf node_modules && \
 apk del build-base python3-dev
 
 FROM alpine:3.12
-MAINTAINER per@sysx.no
+LABEL maintainer="per@sysx.no"
 ENV IS_DOCKER True
 WORKDIR /app
 # Install dependencies
