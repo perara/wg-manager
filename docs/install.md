@@ -1,31 +1,57 @@
-# Installation for raspberry-pi 4
-These instructions are untested, and should be verified by someone. Please create a ticket :)
-
+# Installation for Linux (Ubuntu, Debian, Raspberry Pi)
+These instructions are tested working on:\
+:heavy_check_mark: Ubuntu 20.04\
+:heavy_check_mark: Ubuntu 18.04\
+:x: Ubuntu 16.04 (fails when starting the http server `uvicorn main:app --host=0.0.0.0`)\
+:x: Debian 10\
+&nbsp;&nbsp;(fails when starting the wg0 interface`[#] ip link add wg0 type wireguard\nRTNETLINK answers: Operation not supported\nUnable to access interface: Protocol not supported\n[#] ip link delete dev wg0\nCannot find device "wg0"\n'`)\
+:x: Debian 9
+&nbsp;&nbsp;(fails at `pip install -r requirements.txt` error: `Could not find a version that satisfies the requirement fastapi (from -r requirements.txt (line 2)) (from versions: `)
 
 ## 1. Setup required environment variables
 ```
-export <ENV> <VALUE>
+export <ENV>=<VALUE>
+```
+You will need the following:
+```
+export ADMIN_USERNAME=admin
+export ADMIN_PASSWORD=admin
 ```
 Make it permanent with putting it in bashrc
 Refer to the list in the main readme file.
 
 ## 2. Install Depedencies
+
+### Python
 ```
 sudo apt-get update && sudo apt-get install git python3 python3-pip python3-venv -y
 ```
 
-### Node.JS
+### Node.JS: Ubuntu
 ```
 curl -sL https://deb.nodesource.com/setup_13.x | sudo bash -
 sudo apt-get install -y nodejs
 ```
+
+### Node.JS: Debian
+```
+sudo apt install curl
+curl -sL https://deb.nodesource.com/setup_13.x | sudo bash -
+sudo apt-get install -y nodejs
+```
 ### WireGuard: Ubuntu
+#### 18.04 and later
+```
+sudo apt update
+sudo apt install wireguard wireguard-tools -y
+```
+#### 16.04 and earlier
 ```
 sudo add-apt-repository ppa:wireguard/wireguard -y
 sudo apt install wireguard wireguard-tools -y
 ```
 
-### WireGuard: Debian/RPI
+### WireGuard: Debian 10/Raspberry Pi (with Raspbian 10)
 ```
 # Get signing keys to verify the new packages, otherwise they will not install
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC 648ACFD622F3D138
@@ -37,14 +63,26 @@ sudo apt update
 sudo apt install wireguard wireguard-tools -y
 ```
 
+### WireGuard: Debian 9/Raspberry Pi (with Raspbian 9)
+```
+# Get signing keys to verify the new packages, otherwise they will not install
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC 648ACFD622F3D138
+
+echo "deb http://deb.debian.org/debian/ unstable main" | sudo tee -a /etc/apt/sources.list.d/unstable.list
+
+sudo apt update
+sudo apt install wireguard wireguard-tools -y
+```
+
 ## 3. Building front-end
 ```
 # Building frontend
 sudo git clone https://github.com/perara/wg-manager.git /opt/wg-manager
 cd /opt/wg-manager/wg_dashboard_frontend
 sudo npm install > /dev/null && sudo npm install @angular/cli > /dev/null
-sudo node_modules/@angular/cli/bin/ng build --configuration="production" > /dev/null
+sudo node_modules/@angular/cli/bin/ng build --configuration="production"
 ```
+One thing to be aware of is that when issuing the `sudo node_modules/@angular/cli/bin/ng build --configuration="production"` command, if you do not have enough memory on your server, the process will get "Killed". This happens when trying to compile on the lowest tier DIgital Ocean droplet. To get around this you can either add more memory or create a swap file. Here is a great guide on [creating a swap file](https://linuxize.com/post/create-a-linux-swap-file/).
 
 ## 4. Setup back-end
 ```
