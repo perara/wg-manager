@@ -6,7 +6,7 @@ def upgrade(migrate_engine):
     try:
         meta = MetaData(bind=migrate_engine)
         peer = Table('server', meta, autoload=True)
-        v6_subnet = Column('v6_subnet', INTEGER)
+        v6_subnet = Column('v6_subnet', INTEGER, nullable=True)
         v6_subnet.create(peer)
     except:
         pass
