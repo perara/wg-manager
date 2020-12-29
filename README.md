@@ -23,7 +23,7 @@ The features of wg-manager includes:
 * Create and manage API-Keys
 
 # Dependencies
-* Linux >= 5.6 *(Alternatively: wireguard-dkms)*
+* Linux Kernel >= 5.6 *(Alternatively: wireguard-dkms)*
 
 # Common Installation Steps
 1. Enable ip forwarding:
@@ -69,8 +69,9 @@ services:
       WEB_CONCURRENCY: 1
 ```
 or [plain docker here](./docs/guides/docker_configuration.md)
+or [build docker image from github](./docs/install_docker_github.md)
 
-# Method #2: Bare Metal
+## Method #2: Bare Metal
 - [Installation on Debian/Ubuntu/RPI4](./docs/install.md)
 
 # Using the development branch
