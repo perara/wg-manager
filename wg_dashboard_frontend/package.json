@@ -16,18 +16,19 @@
     "tlint:fix": "ng lint --fix",
     "slint": "stylelint --syntax scss ./**/*.scss",
     "slint:fix": "stylelint --syntax scss --fix ./**/*.scss",
-    "lint": "ng lint && stylelint --syntax scss ./**/*.scss"
+    "lint": "ng lint && stylelint --syntax scss ./**/*.scss",
+    "postinstall": "ngcc"
   },
   "pre-commit": "lint",
-  "private": true,
+  "private": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/CreativeIT/material-angular-dashboard"
+    "url": "https://github.com/perara/wg-manager"
   },
   "bugs": {
-    "url": "https://github.com/CreativeIT/material-angular-dashboard/issues"
+    "url": "https://github.com/perara/wg-manager/issues"
   },
-  "homepage": "https://github.com/CreativeIT/material-angular-dashboard",
+  "homepage": "https://github.com/perara/wg-manager",
   "dependencies": {
     "@angular/animations": "9.1.0",
     "@angular/cdk": "^9.2.0",
