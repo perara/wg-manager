@@ -29,7 +29,7 @@ import { ErrorComponent } from './page/error';
         { path: '**', redirectTo: '/page/404' },
 
       ],
-      { useHash: true },
+      { useHash: true, relativeLinkResolution: 'legacy' },
     ),
     LayoutModule,
   ],
