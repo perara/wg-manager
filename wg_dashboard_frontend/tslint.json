@@ -14,6 +14,9 @@
         "ignore-pattern": "(\"|'|`).*?\\1"
       }
     ],
+    "deprecation": {
+      "severity": "warning"
+    },
     "function-name": [
       true,
       {
