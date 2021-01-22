@@ -51,6 +51,7 @@
     "file-saver": "2.0.5",
     "hammerjs": "2.0.8",
     "install": "0.13.0",
+    "ip-address": "^7.1.0",
     "ip-cidr": "2.1.1",
     "js-file-download": "0.4.12",
     "jszip": "3.5.0",
