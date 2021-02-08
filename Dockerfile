@@ -32,6 +32,7 @@ COPY wg_dashboard_backend /app
 RUN apt-get update && apt-get install -y \
   wireguard-tools \
   iptables \
+  iproute2 \
   python3 \
   python3-pip \
   python3-dev \
