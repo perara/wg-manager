@@ -16,7 +16,6 @@ import database.util
 app = FastAPI()
 app.add_middleware(BaseHTTPMiddleware, dispatch=middleware.db_session_middleware)
 
-# Configure web routers
 app.include_router(
     user.router,
     prefix="/api/v1",

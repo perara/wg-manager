@@ -1,5 +1,6 @@
-dist: xenial
-sudo: required
+dist: focal
+os: linux
+language: python
 env:
   global:
     - DOCKER_REPO=perara/wg-manager
