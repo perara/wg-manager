@@ -9,9 +9,6 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Branch-Name
-        uses: nelonoel/branch-name@v1
 
       -
         name: Checkout
