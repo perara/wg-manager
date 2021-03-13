@@ -40,6 +40,13 @@
         </mat-form-field>
       </p>
 
+      <p>
+        <mat-form-field class="full-width">
+          <mat-label>PersistentKeepalive interval</mat-label>
+          <input [disabled]="!peer._edit" name="keep_alive" [(ngModel)]="peer.keep_alive" matInput>
+        </mat-form-field>
+      </p>
+
 
       <p>Keys</p>
       <p>

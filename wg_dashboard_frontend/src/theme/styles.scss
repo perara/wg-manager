@@ -78,3 +78,8 @@ body {
 .red{
   color:red;
 }
+
+.mat-form-field{
+  // TODO this is a sleezy fix for cutting text in input boxes. need to figure out the root cause eventually.
+  line-height: 1.5;
+}

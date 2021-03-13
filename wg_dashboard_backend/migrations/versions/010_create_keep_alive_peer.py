@@ -5,9 +5,9 @@ from migrate import *
 def upgrade(migrate_engine):
     try:
         meta = MetaData(bind=migrate_engine)
-        peer = Table('server', meta, autoload=True)
-        v6_subnet = Column('v6_subnet', INTEGER, nullable=True)
-        v6_subnet.create(peer)
+        peer = Table('peer', meta, autoload=True)
+        keep_alive = Column('keep_alive', Integer)
+        keep_alive.create(peer)
     except:
         pass
 
@@ -15,7 +15,7 @@ def upgrade(migrate_engine):
 def downgrade(migrate_engine):
     try:
         meta = MetaData(bind=migrate_engine)
-        peer = Table('server', meta, autoload=True)
-        peer.c.v6_subnet.drop()
+        peer = Table('peer', meta, autoload=True)
+        peer.c.keep_alive.drop()
     except:
         pass

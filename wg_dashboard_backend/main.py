@@ -44,12 +44,12 @@ _db: Session = SessionLocal()
 if not database_exists(engine.url):
     ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
     if not ADMIN_USERNAME:
-        raise RuntimeError("Database does not exist and the environment variable ADMIN_USERNAME is set")
+        raise RuntimeError("Database does not exist and the environment variable ADMIN_USERNAME is not set")
 
     ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 
     if not ADMIN_PASSWORD:
-        raise RuntimeError("Database does not exist and the environment variable ADMIN_PASSWORD is set")
+        raise RuntimeError("Database does not exist and the environment variable ADMIN_PASSWORD is not set")
 
     # Create database from metadata
     models.Base.metadata.create_all(engine)
@@ -89,7 +89,8 @@ if const.SERVER_INIT_INTERFACE is not None:
     db.wireguard.server_add_on_init(_db)
 
 if const.SERVER_STARTUP_API_KEY is not None:
-    db.api_key.add_initial_api_key_for_admin(_db, const.SERVER_STARTUP_API_KEY)
+    ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
+    db.api_key.add_initial_api_key_for_admin(_db, const.SERVER_STARTUP_API_KEY, ADMIN_USERNAME)
 _db.close()
 
 

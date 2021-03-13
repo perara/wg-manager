@@ -43,8 +43,6 @@ else:
     DEFAULT_CONFIG_DIR = "/config"
     os.makedirs(DEFAULT_CONFIG_DIR, exist_ok=True)
 
-PEER_DEFAULT_ALLOWED_IPS = ["0.0.0.0/0", "::/0"]
-
 
 ENV_CONFIG_DIR = os.getenv("ENV_CONFIG_DIR", DEFAULT_CONFIG_DIR)
 os.makedirs(ENV_CONFIG_DIR, exist_ok=True)

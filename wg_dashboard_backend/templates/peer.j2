@@ -1,12 +1,13 @@
 [Interface]
 Address = {{ data.peer.address }}/{{ data.server.subnet }}{%- if is_ipv6 -%},{{ data.peer.v6_address }}/{{ data.server.v6_subnet }}{%- endif %}
 PrivateKey = {{ data.peer.private_key }}
+{% if data.peer.dns %}
 DNS = {{ data.peer.dns }}
+{% endif %}
 
 [Peer]
 PublicKey = {{ data.server.public_key }}
 AllowedIPs = {{ data.peer.allowed_ips }}
 Endpoint = {{ data.server.endpoint }}:{{ data.server.listen_port }}
-{% if data.peer.shared_key %}
-PresharedKey = {{ data.peer.shared_key }}
-{% endif %}
+{% if data.peer.shared_key %}PresharedKey = {{ data.peer.shared_key }}{% endif %}
+{% if data.peer.keep_alive %}PersistentKeepalive = {{data.peer.keep_alive}}{% endif %}

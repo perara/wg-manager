@@ -23,7 +23,7 @@ The features of wg-manager includes:
 * Create and manage API-Keys
 
 # Dependencies
-* Linux >= 5.6 *(Alternatively: wireguard-dkms)*
+* Linux Kernel >= 5.6 *(Alternatively: wireguard-dkms)*
 
 # Common Installation Steps
 1. Enable ip forwarding:
@@ -41,7 +41,7 @@ The features of wg-manager includes:
 3. It is recommended to have a firewall protecting your servers
 
 ## Notes
-* A few people has experienced issues with running the dockerized method using bridged networking. To fix this, you can use `network_mode: host`. Note that you can no longer reverse-proxy the web interface from reverse proxies such as [jwilder/nginx-proxy](https://hub.docker.com/r/jwilder/nginx-proxy/).
+* A few people has experienced issues with running the dockerized method using bridged networking. To workaround this, you can use `network_mode: host`. Note that you can no longer reverse-proxy the web interface from reverse proxies such as [jwilder/nginx-proxy](https://hub.docker.com/r/jwilder/nginx-proxy/).
 
 ## Method #1: Docker-compose
 ```yaml
@@ -69,8 +69,9 @@ services:
       WEB_CONCURRENCY: 1
 ```
 or [plain docker here](./docs/guides/docker_configuration.md)
+or [build docker image from github](./docs/install_docker_github.md)
 
-# Method #2: Bare Metal
+## Method #2: Bare Metal
 - [Installation on Debian/Ubuntu/RPI4](./docs/install.md)
 
 # Using the development branch
@@ -197,6 +198,10 @@ networks:
 | CLIENT_X_SERVER_HOST | The url to wg-manager server e.g. "http://server:8888"  See docs      | url         |
 | CLIENT_X_SERVER_INTERFACE | The wg-interface to create client on e.g"wg0". See docs          | string      |
 | CLIENT_X_API_KEY | A valid API-Key that is active on the server. Works well with SERVER_STARTUP_API_KEY | string |
+
+# Q&A
+I'm trying to start the device but recieve the message: `Perhaps ip6tables or your kernel needs to be upgraded.`.
+    Try: `modprobe ip6table_nat` on the host.
 
 # Showcase
 ![Illustration](docs/images/0.png)

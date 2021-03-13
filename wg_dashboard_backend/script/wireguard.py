@@ -259,7 +259,7 @@ def retrieve_client_conf_from_server(
     return response.text
 
 
-def create_client_config(sess: Session, configuration, client_name):
+def create_client_config(sess: Session, configuration, client_name, client_routes):
 
     parser = configparser.ConfigParser()
     parser.read_string(configuration)
@@ -332,7 +332,7 @@ def create_client_config(sess: Session, configuration, client_name):
 
     db_peer.private_key = parser["Interface"]["PrivateKey"]
     db_peer.public_key = "N/A"
-    db_peer.allowed_ips = parser["Peer"]["AllowedIPs"]
+    db_peer.allowed_ips = client_routes if client_routes else parser["Peer"]["AllowedIPs"]
     db_peer.configuration = configuration
     db_server.interface = f"client_{db_peer.name}"
     db_server.configuration = configuration
@@ -368,6 +368,7 @@ def load_environment_clients(sess: Session):
         client_server_interface = os.getenv(f"CLIENT_{i}_SERVER_INTERFACE", None)
         client_server_host = os.getenv(f"CLIENT_{i}_SERVER_HOST", None)
         client_api_key = os.getenv(f"CLIENT_{i}_API_KEY", None)
+        client_routes = os.getenv(f"CLIENT_{i}_ROUTES", None)
 
         if client_api_key is None or \
                 client_server_interface is None or \
@@ -385,7 +386,7 @@ def load_environment_clients(sess: Session):
             server_api_key=client_api_key
         )
 
-        create_client_config(sess, configuration=config, client_name=client_name)
+        create_client_config(sess, configuration=config, client_name=client_name, client_routes=client_routes)
 
         i += 1
 

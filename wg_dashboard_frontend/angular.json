@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "material-angular-dashboard": {
+    "wg-manager": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -38,7 +38,6 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
@@ -56,19 +55,19 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "material-angular-dashboard:build",
+            "browserTarget": "wg-manager:build",
             "proxyConfig": "proxy.conf.json"
           },
           "configurations": {
             "production": {
-              "browserTarget": "material-angular-dashboard:build:production"
+              "browserTarget": "wg-manager:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "material-angular-dashboard:build"
+            "browserTarget": "wg-manager:build"
           }
         },
         "lint": {
@@ -84,13 +83,13 @@
         }
       }
     },
-    "material-angular-dashboard-e2e": {
+    "wg-manager-e2e": {
       "root": "",
       "sourceRoot": "",
       "projectType": "application"
     }
   },
-  "defaultProject": "material-angular-dashboard",
+  "defaultProject": "wg-manager",
   "cli": {
     "packageManager": "yarn"
   },

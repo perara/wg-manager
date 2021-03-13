@@ -3,10 +3,10 @@ from sqlalchemy.orm import Session
 import models
 
 
-def add_initial_api_key_for_admin(sess: Session, api_key):
+def add_initial_api_key_for_admin(sess: Session, api_key, ADMIN_USERNAME):
 
     db_user = sess.query(models.User)\
-        .filter_by(username="admin")\
+        .filter_by(username=ADMIN_USERNAME)\
         .one()
 
     exists_api_key = sess.query(models.UserAPIKey)\
