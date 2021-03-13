@@ -4,8 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from starlette.responses import PlainTextResponse
 
-import const
-import models
+from database import models
 import schemas
 import middleware
 import db.wireguard

@@ -8,10 +8,8 @@ from starlette.exceptions import HTTPException
 
 import const
 import script.wireguard
-from sqlalchemy import exists
-from sqlalchemy.orm import Session, joinedload
-import util
-import models
+from sqlalchemy.orm import Session
+from database import models
 import schemas
 import logging
 

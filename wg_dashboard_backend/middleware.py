@@ -11,10 +11,9 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 import const
-import models
 import schemas
-from database import SessionLocal
-import db.user
+from database import models
+from database.database import SessionLocal
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/login", auto_error=False)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

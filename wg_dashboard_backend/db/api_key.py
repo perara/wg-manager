@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-import models
+from database import models
 
 
 def add_initial_api_key_for_admin(sess: Session, api_key, ADMIN_USERNAME):

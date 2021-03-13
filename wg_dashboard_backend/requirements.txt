@@ -16,3 +16,5 @@ uvicorn
 uvloop
 httptools
 qrcode[pil]
+alembic
+loguru

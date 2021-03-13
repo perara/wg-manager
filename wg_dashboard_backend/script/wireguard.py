@@ -9,13 +9,13 @@ import configparser
 from sqlalchemy.orm import Session
 
 import const
-import models
 import schemas
 import os
 import re
 import ipaddress
 import util
-from database import SessionLocal
+from database import models
+from database.database import SessionLocal
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -390,7 +390,6 @@ def load_environment_clients(sess: Session):
 
         i += 1
 
-
 if __name__ == "__main__":
     os.environ["CLIENT_1_NAME"] = "client-1"
     os.environ["CLIENT_1_SERVER_INTERFACE"] = "wg0"
@@ -403,3 +402,5 @@ if __name__ == "__main__":
     sess: Session = SessionLocal()
     load_environment_clients(sess)
     sess.close()
+
+

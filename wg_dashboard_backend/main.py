@@ -1,99 +1,22 @@
-import logging
-import os
+import const
 import time
-
-import typing
-from sqlalchemy_utils import database_exists
 from starlette.middleware.base import BaseHTTPMiddleware
 
-import const
-import db.wireguard
-import db.api_key
 import middleware
-from database import engine, SessionLocal
 from routers.v1 import user, server, peer, wg
-import script.wireguard
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-if not logger.hasHandlers():
-    sh = logging.StreamHandler()
-    fmt = logging.Formatter(fmt="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
-    sh.setFormatter(fmt)
-    logger.addHandler(sh)
+import script.wireguard_startup
 import pkg_resources
 import uvicorn as uvicorn
 from fastapi.staticfiles import StaticFiles
-from sqlalchemy.orm import Session
+
 from starlette.responses import FileResponse
 from fastapi import Depends, FastAPI
-from const import DATABASE_URL
-from migrate import DatabaseAlreadyControlledError
-from migrate.versioning.shell import main
-import models
-
-# Sleep the wait timer.
-time.sleep(const.INIT_SLEEP)
+import database.util
 
 app = FastAPI()
 app.add_middleware(BaseHTTPMiddleware, dispatch=middleware.db_session_middleware)
 
-_db: Session = SessionLocal()
-
-# Ensure database existence
-
-if not database_exists(engine.url):
-    ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
-    if not ADMIN_USERNAME:
-        raise RuntimeError("Database does not exist and the environment variable ADMIN_USERNAME is set")
-
-    ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
-
-    if not ADMIN_PASSWORD:
-        raise RuntimeError("Database does not exist and the environment variable ADMIN_PASSWORD is set")
-
-    # Create database from metadata
-    models.Base.metadata.create_all(engine)
-
-    # Create default user
-    _db.merge(models.User(
-        username=ADMIN_USERNAME,
-        password=middleware.get_password_hash(ADMIN_PASSWORD),
-        full_name="Admin",
-        role="admin",
-        email=""
-    ))
-    _db.commit()
-
-
-# Do migrations
-try:
-    main(["version_control", DATABASE_URL, "migrations"])
-except DatabaseAlreadyControlledError:
-    pass
-main(["upgrade", DATABASE_URL, "migrations"])
-
-
-servers: typing.List[models.WGServer] = _db.query(models.WGServer).all()
-for s in servers:
-    try:
-        last_state = s.is_running
-        if script.wireguard.is_installed() and last_state and not script.wireguard.is_running(s):
-            script.wireguard.start_interface(s)
-    except Exception as e:
-        print(e)
-
-if const.CLIENT:
-    script.wireguard.load_environment_clients(_db)
-
-if const.SERVER_INIT_INTERFACE is not None:
-    db.wireguard.server_add_on_init(_db)
-
-if const.SERVER_STARTUP_API_KEY is not None:
-    ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
-    db.api_key.add_initial_api_key_for_admin(_db, const.SERVER_STARTUP_API_KEY, ADMIN_USERNAME)
-_db.close()
-
-
+# Configure web routers
 app.include_router(
     user.router,
     prefix="/api/v1",
@@ -149,4 +72,16 @@ async def shutdown():
 
 
 if __name__ == "__main__":
+    # Sleep the wait timer.
+    time.sleep(const.INIT_SLEEP)
+
+    # Ensure database existence
+    database.util.setup_initial_database()
+
+    # Perform Migrations
+    database.util.perform_migrations()
+
+    # Configure wireguard
+    script.wireguard_startup.setup_on_start()
+
     uvicorn.run("__main__:app", reload=True)

@@ -4,7 +4,7 @@ import sqlalchemy
 
 from sqlalchemy import Integer, Column, DateTime
 from sqlalchemy.orm import relationship, backref
-from database import Base
+from database.database import Base
 
 
 class User(Base):

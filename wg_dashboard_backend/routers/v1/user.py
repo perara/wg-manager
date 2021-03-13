@@ -2,7 +2,7 @@ import os
 from datetime import timedelta
 
 from fastapi import APIRouter, HTTPException, Depends, Form, Body
-from fastapi.responses import PlainTextResponse, JSONResponse
+from fastapi.responses import JSONResponse
 import typing
 from sqlalchemy.orm import Session
 from starlette import status
@@ -10,7 +10,7 @@ from binascii import hexlify
 import const
 import db.user
 import middleware
-import models
+from database import models
 import schemas
 
 router = APIRouter()

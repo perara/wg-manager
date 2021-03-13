@@ -5,7 +5,7 @@ from pydantic import BaseModel, typing
 from sqlalchemy.orm import Session, Query
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 import logging
-import models
+from database import models
 
 _LOGGER = logging.getLogger(__name__)
 

@@ -1,8 +1,7 @@
 from typing import Optional
 
 from sqlalchemy.orm import Session
-import models
-from passlib.context import CryptContext
+from database import models
 
 import schemas
 
