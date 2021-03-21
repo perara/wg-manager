@@ -35,7 +35,7 @@ sudo apt-get install -y nodejs
 ### Node.JS: Debian
 ```
 sudo apt install curl
-curl -sL https://deb.nodesource.com/setup_13.x | sudo bash -
+curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
 sudo apt-get install -y nodejs
 ```
 ### WireGuard: Ubuntu
@@ -78,7 +78,7 @@ sudo apt install wireguard wireguard-tools -y
 # Building frontend
 sudo git clone https://github.com/perara/wg-manager.git /opt/wg-manager
 cd /opt/wg-manager/wg_dashboard_frontend
-sudo npm install > /dev/null && sudo npm install @angular/cli > /dev/null
+sudo npm install --unsafe-perm > /dev/null && sudo npm install @angular/cli > /dev/null
 sudo node_modules/@angular/cli/bin/ng build --configuration="production"
 ```
 One thing to be aware of is that when issuing the `sudo node_modules/@angular/cli/bin/ng build --configuration="production"` command, if you do not have enough memory on your server, the process will get "Killed". This happens when trying to compile on the lowest tier DIgital Ocean droplet. To get around this you can either add more memory or create a swap file. Here is a great guide on [creating a swap file](https://linuxize.com/post/create-a-linux-swap-file/).
@@ -88,9 +88,9 @@ One thing to be aware of is that when issuing the `sudo node_modules/@angular/cl
 sudo mv dist ../wg_dashboard_backend/build
 cd ../wg_dashboard_backend/
 sudo python3 -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-pip install uvicorn
-uvicorn main:app --host=0.0.0.0
+sudo pip3 install -r requirements.txt
+sudo pip3 install uvicorn
+sudo uvicorn main:app --host=0.0.0.0
 ```
 
 ## 5. Complete

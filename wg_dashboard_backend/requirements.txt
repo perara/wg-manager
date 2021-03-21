@@ -2,7 +2,7 @@ pydantic
 fastapi
 aiofiles
 aiosqlite
-sqlalchemy
+sqlalchemy < 1.4.0
 databases
 PyJWT
 passlib
