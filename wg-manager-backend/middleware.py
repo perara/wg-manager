@@ -4,6 +4,7 @@ import jwt
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jwt import PyJWTError
+from loguru import logger
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from starlette import status
@@ -25,6 +26,12 @@ def get_password_hash(password):
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
+
+
+async def logging_middleware(request: Request, call_next):
+    response = await call_next(request)
+    logger.opt(depth=2).info(f"{request.method} {request.url} - Code: {response.status_code}")
+    return response
 
 
 async def db_session_middleware(request: Request, call_next):

@@ -11,10 +11,9 @@ import script.wireguard
 from sqlalchemy.orm import Session
 from database import models
 import schemas
-import logging
+from loguru import logger
 
-_LOGGER = logging.getLogger(__name__)
-_LOGGER.setLevel(logging.DEBUG)
+from util import WGMHTTPException
 
 
 def start_client(sess: Session, peer: schemas.WGPeer):
@@ -161,8 +160,8 @@ def server_add_on_init(sess: Session):
             # Only add if it does not already exists.
             server_add(schemas.WGServerAdd(**init_data), sess, start=const.SERVER_INIT_INTERFACE_START)
     except Exception as e:
-        _LOGGER.warning("Failed to setup initial server interface with exception:")
-        _LOGGER.exception(e)
+        logger.warning("Failed to setup initial server interface with exception:")
+        logger.exception(e)
 
 
 def server_add(server: schemas.WGServerAdd, sess: Session, start=False):
@@ -180,43 +179,54 @@ def server_add(server: schemas.WGServerAdd, sess: Session, start=False):
 
     peers = server.peers if server.peers else []
 
-    # Public/Private key
-    try:
+    all_interfaces = sess.query(models.WGServer).all()
+    check_interface_exists = any(map(lambda el: el.interface == server.interface, all_interfaces))
+    check_v4_address_exists = any(map(lambda el: el.address == server.address, all_interfaces))
+    check_v6_address_exists = any(map(lambda el: el.v6_address == server.v6_address, all_interfaces))
+    check_listen_port_exists = any(map(lambda el: el.listen_port == server.listen_port, all_interfaces))
+    if check_interface_exists:
+        raise WGMHTTPException(
+            status_code=400,
+            detail=f"There is already a interface with the name: {server.interface}")
 
-        if sess.query(models.WGServer) \
-                .filter(
-            (models.WGServer.interface == server.interface) |
-            (models.WGServer.address == server.address) |
-            (models.WGServer.v6_address == server.v6_address)).count() != 0:
-            raise HTTPException(status_code=400,
-                                detail="The server interface or ip %s already exists in the database" % server.interface)
+    if check_v4_address_exists:
+        raise WGMHTTPException(
+            status_code=400,
+            detail=f"There is already a interface with the IPv4 address: {server.address}")
 
-        if not server.private_key:
-            keys = script.wireguard.generate_keys()
-            server.private_key = keys["private_key"]
-            server.public_key = keys["public_key"]
+    if check_v6_address_exists:
+        raise WGMHTTPException(
+            status_code=400,
+            detail=f"There is already a interface with the IPv6 address: {server.v6_address}")
 
-        server.configuration = script.wireguard.generate_config(server)
-        server.peers = []
-        server.sync(sess)
+    if check_listen_port_exists:
+        raise WGMHTTPException(
+            status_code=400,
+            detail=f"There is already a interface listening on port: {server.listen_port}")
 
-        if len(peers) > 0:
-            server.from_db(sess)
+    if not server.private_key:
+        keys = script.wireguard.generate_keys()
+        server.private_key = keys["private_key"]
+        server.public_key = keys["public_key"]
 
-            for schemaPeer in peers:
-                schemaPeer.server_id = server.id
-                schemaPeer.configuration = script.wireguard.generate_config(dict(
-                    peer=schemaPeer,
-                    server=server
-                ))
-                dbPeer = models.WGPeer(**schemaPeer.dict())
-                sess.add(dbPeer)
-                sess.commit()
+    server.configuration = script.wireguard.generate_config(server)
+    server.peers = []
+    server.sync(sess)
 
+    if len(peers) > 0:
         server.from_db(sess)
 
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        for schemaPeer in peers:
+            schemaPeer.server_id = server.id
+            schemaPeer.configuration = script.wireguard.generate_config(dict(
+                peer=schemaPeer,
+                server=server
+            ))
+            dbPeer = models.WGPeer(**schemaPeer.dict())
+            sess.add(dbPeer)
+            sess.commit()
+
+    server.from_db(sess)
 
     if start and not script.wireguard.is_running(server):
         script.wireguard.start_interface(server)

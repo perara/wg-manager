@@ -1,3 +1,4 @@
+import contextlib
 import os
 
 import alembic.command
@@ -14,9 +15,11 @@ from loguru import logger
 def perform_migrations():
     logger.info("Performing migrations...")
     alembic_cfg = Config("alembic.ini")
+    alembic_cfg.attributes['configure_logger'] = False
 
     alembic_cfg.set_main_option('script_location', "migrations")
     alembic_cfg.set_main_option('sqlalchemy.url', str(engine.url))
+
     alembic.command.upgrade(alembic_cfg, 'head')
     logger.info("Migrations done!")
 
