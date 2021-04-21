@@ -60,7 +60,7 @@ class GenericModel(BaseModel):
         if n_results == 0:
             # Insert, does not exists at all.
             # Convert from schema to model
-            dbm = self.Meta.model(**self.dict())
+            dbm = self.Meta.model(**self.dict(exclude=self.Meta.excludes)) # TODO. added exclude here. this might mess stuff?
             sess.add(dbm)
         else:
             self.filter_query(sess).update(self.dict(include=self.columns()))
@@ -179,7 +179,7 @@ class WGServer(GenericModel):
     class Meta:
         model = models.WGServer
         key = "interface"
-        excludes = {"id", "peers"}
+        excludes = {"id", "peers", "v6_support"}
 
     def convert(self):
         self.peers = [] if not self.peers else self.peers
@@ -190,6 +190,7 @@ class WGServerAdd(WGServer):
     address: str
     interface: str
     listen_port: int
+    v6_support: bool
 
 
 class WGPeerConfigAdd(GenericModel):

@@ -37,8 +37,10 @@ export class AddServerComponent implements OnInit {
 
   v4Subnets = [];
   v6Subnets = [];
+  defaultEndpoint = "replace-me.com"
   defaultListenPort = "51820"
   defaultInterface = "wg0"
+  defaultHasIPV6Support = false;
   defaultIPv4Subnet = 24;
   defaultIPv6Subnet = 64;
   defaultIPv4Address = "10.0.200.1"
@@ -54,13 +56,14 @@ export class AddServerComponent implements OnInit {
 
   initForm(){
     this.serverForm = new FormGroup({
+      v6_address: new FormControl({value: this.defaultIPv6Address, disabled: !this.defaultHasIPV6Support}, [Validators.required, IPValidator.isIPAddress]),
+      v6_subnet: new FormControl({value: this.defaultIPv6Subnet, disabled: !this.defaultHasIPV6Support}, [Validators.required, Validators.min(1), Validators.max(64)]),
+      v6_support: new FormControl(this.defaultHasIPV6Support, [Validators.required]),
       address: new FormControl(this.defaultIPv4Address, [Validators.required, IPValidator.isIPAddress]),
-      v6_address: new FormControl(this.defaultIPv6Address, [Validators.required, IPValidator.isIPAddress]),
       subnet: new FormControl(this.defaultIPv4Subnet, [Validators.required, Validators.min(1), Validators.max(32)]),
-      v6_subnet: new FormControl(this.defaultIPv6Subnet, [Validators.required, Validators.min(1), Validators.max(64)]),
       interface: new FormControl(this.defaultInterface, [Validators.required, Validators.minLength(3)]),
       listen_port: new FormControl(this.defaultListenPort, [Validators.required, NumberValidator.stringIsNumber]),
-      endpoint: new FormControl('', Validators.required),
+      endpoint: new FormControl(this.defaultEndpoint, Validators.required),
       dns: new FormControl(this.defaultDNS),
       allowed_ips: new FormControl(this.defaultAllowedIPs),
       keep_alive: new FormControl(this.defaultPersistentKeepalive),

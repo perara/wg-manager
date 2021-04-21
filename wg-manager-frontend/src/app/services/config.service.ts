@@ -25,9 +25,8 @@ export class ConfigService {
         `Backend returned code ${error.status}, ` +
         `body was: ${error.error}`);
     }
-      this.notify.notify("error", error.error.detail)
-    // return an observable with a user-facing error message
-    return throwError(
-      'Something bad happened; please try again later.');
+      this.notify.notify("error", JSON.stringify(error.error.detail))
+      // return an observable with a user-facing error message
+      return throwError('Something bad happened; please try again later.');
   }
 }

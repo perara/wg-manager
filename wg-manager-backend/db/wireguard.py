@@ -183,7 +183,7 @@ def server_add(server: schemas.WGServerAdd, sess: Session, start=False):
     check_interface_exists = any(map(lambda el: el.interface == server.interface, all_interfaces))
     check_v4_address_exists = any(map(lambda el: el.address == server.address, all_interfaces))
     check_v6_address_exists = any(map(lambda el: el.v6_address == server.v6_address, all_interfaces))
-    check_listen_port_exists = any(map(lambda el: el.listen_port == server.listen_port, all_interfaces))
+    check_listen_port_exists = any(map(lambda el: str(el.listen_port) == str(server.listen_port), all_interfaces))
     if check_interface_exists:
         raise WGMHTTPException(
             status_code=400,
@@ -194,7 +194,7 @@ def server_add(server: schemas.WGServerAdd, sess: Session, start=False):
             status_code=400,
             detail=f"There is already a interface with the IPv4 address: {server.address}")
 
-    if check_v6_address_exists:
+    if server.v6_support and check_v6_address_exists:
         raise WGMHTTPException(
             status_code=400,
             detail=f"There is already a interface with the IPv6 address: {server.v6_address}")

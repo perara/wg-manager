@@ -1,17 +1,19 @@
 <div
-  fxFlexFill
-  fxLayout="row"
+  fxLayout="column"
   fxLayout.lt-lg="column"
+  style="padding: 10px;"
+  fxLayoutGap="20px">
 
-  style="padding: 10px;" fxLayoutGap="20px">
 
-  <div fxFlex="65">
+  <div fxFlex="100">
+    <app-add-server [(servers)]="servers"></app-add-server>
+  </div>
+
+  <div fxFlex="100">
       <app-server [(server)]="servers[idx]" [(servers)]="servers" *ngFor="let server of servers; let idx = index"></app-server>
   </div>
 
-  <div fxFlex="35">
-    <app-add-server [(servers)]="servers"></app-add-server>
-  </div>
+
 
 
 </div>
