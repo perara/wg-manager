@@ -48,22 +48,22 @@ Thumbs.db
 
 docker/__pycache__/
 
-wg_dashboard_backend/__pycache__/
+wg-manager-backend/__pycache__/
 
-wg_dashboard_frontend/yarn.lock
+wg-manager-frontend/yarn.lock
 
-wg_dashboard_backend/config/server/wg0/clients/4.conf
+wg-manager-backend/config/server/wg0/clients/4.conf
 
-wg_dashboard_backend/config/server/wg0/clients/5.conf
+wg-manager-backend/config/server/wg0/clients/5.conf
 
-wg_dashboard_backend/config/server/wg0/clients/6.conf
+wg-manager-backend/config/server/wg0/clients/6.conf
 
-wg_dashboard_backend/config/server/wg0/clients/7.conf
+wg-manager-backend/config/server/wg0/clients/7.conf
 
-wg_dashboard_backend/config/server/wg0/wg0.conf
+wg-manager-backend/config/server/wg0/wg0.conf
 
 wg-dashboard-py.iml
 
 docker/wg0.conf
 
-wg_dashboard_backend/database.db
+wg-manager-backend/database.db
