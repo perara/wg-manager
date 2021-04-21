@@ -2,7 +2,8 @@ FROM ubuntu:20.04
 ENV TZ=Europe/Minsk
 ENV DEBIAN_FRONTEND=noninteractive
 
-COPY ./wg-manager /tmp/build
+#COPY ./wg-manager /tmp/build
+RUN mkdir -p /tmp/build
 WORKDIR /tmp/build
 
 RUN apt-get update && apt-get install -y \
