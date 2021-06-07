@@ -64,8 +64,8 @@ services:
     environment:
       HOST: 0.0.0.0
       PORT: 8888
-      ADMIN_PASSWORD: admin
       ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: admin
       WEB_CONCURRENCY: 1
 ```
 or [plain docker here](./docs/guides/docker_configuration.md)
