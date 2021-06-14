@@ -11,6 +11,7 @@ import {forkJoin, from} from "rxjs";
 import {map, mergeMap} from "rxjs/operators";
 import {NotifierService} from "angular-notifier";
 import {MatCheckboxChange} from "@angular/material/checkbox";
+import {Address4, Address6} from 'ip-address'
 @Component({
   selector: 'app-add-server',
   templateUrl: './add-server.component.html',
@@ -174,8 +175,19 @@ export class AddServerComponent implements OnInit {
       return false;
     }
 
-    iFace.nodes["subnet"] = iFace.nodes["address"].split("/")[1];
-    iFace.nodes["address"] = iFace.nodes["address"].split("/")[0];
+    iFace.nodes["address"]
+    .split(",")
+    .map(x => x.trim())
+    .forEach(cidr => {
+      const [address, subnet] = cidr.split("/");
+      if (Address4.isValid(address)) {
+        iFace.nodes["address"] = address;
+        iFace.nodes["subnet"] = subnet;
+      } else if (Address6.isValid(address)) {
+        iFace.nodes["v6_address"] = address;
+        iFace.nodes["v6_subnet"] = subnet;
+      }
+    })
 
     iFace.nodes["peers"] = sPeers
       .map( x => x.nodes)
