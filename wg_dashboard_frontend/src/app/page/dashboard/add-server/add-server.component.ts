@@ -193,7 +193,19 @@ export class AddServerComponent implements OnInit {
       .map( x => x.nodes)
       .map( x => {
       x.server_id = -1;
-      x.address = x.allowed_ips.split("/")[0];  // Allowed_ips in server is the address of the peer (Seen from server perspective)
+
+      x.allowed_ips // Allowed_ips in server is the address of the peer (Seen from server perspective)
+      .split(",")
+      .map(x => x.trim())
+      .forEach(cidr => {
+        const [address, subnet] = cidr.split("/");
+        if (Address4.isValid(address)) {
+          x.address = address;
+        } else if (Address6.isValid(address)) {
+          x.v6_address = address;
+        }
+      })
+
       x.allowed_ips = null;  // This should be retrieved from peer data config
       return x;
     })
