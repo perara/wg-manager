@@ -2,6 +2,11 @@
 The wg-manager provides an easy-to-use graphical web interface to import, setup, and manage WireGuard server(s).
 [See Here](https://github.com/perara/wg-manager#Showcase)
 
+## Contributions
+All contributions are very much appreciated, and please, to ease the merging process, target your pull requests to the [development] branch (https://github.com/perara/wg-manager/tree/dev) branch to prevent merge conflicts. Thanks!
+
+## Features
+
 The features of wg-manager includes:
 
 **Server**
