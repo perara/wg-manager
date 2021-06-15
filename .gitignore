@@ -67,3 +67,13 @@ wg-dashboard-py.iml
 docker/wg0.conf
 
 wg-manager-backend/database.db
+
+wg-manager-backend/logsaccess.log
+
+wg-manager-backend/database.db_initial_v1 copy
+
+wg-manager-backend/database.db_new_ver
+
+wg-manager-backend/script/obfuscate/binary/shapeshifter-dispatcher
+
+wg-manager/database.db
