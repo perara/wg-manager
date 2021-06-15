@@ -148,7 +148,11 @@ export class AddServerComponent implements OnInit {
     forkJoin(observables).subscribe(data => {
       let server: any = data.filter((x: any) => !x.isClient);
 
-      if(server.length !== 1) {
+      if(server.length == 0) {
+        this.notify.notify("error", "No server files detected!")
+        return false;
+      }
+      if(server.length > 1) {
         // TODO output error - should only be one server
         this.notify.notify("error", "Detected multiple server files!")
         return false;
