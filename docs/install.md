@@ -77,7 +77,7 @@ sudo apt install wireguard wireguard-tools -y
 ```
 # Building frontend
 sudo git clone https://github.com/perara/wg-manager.git /opt/wg-manager
-cd /opt/wg-manager/wg_dashboard_frontend
+cd /opt/wg-manager/wg-manager-frontend
 sudo npm install --unsafe-perm > /dev/null && sudo npm install @angular/cli > /dev/null
 sudo node_modules/@angular/cli/bin/ng build --configuration="production"
 ```
@@ -85,8 +85,8 @@ One thing to be aware of is that when issuing the `sudo node_modules/@angular/cl
 
 ## 4. Setup back-end
 ```
-sudo mv dist ../wg_dashboard_backend/build
-cd ../wg_dashboard_backend/
+sudo mv dist ../wg-manager-backend/build
+cd ../wg-manager-backend/
 sudo python3 -m venv venv && source venv/bin/activate
 sudo pip3 install -r requirements.txt
 sudo pip3 install uvicorn

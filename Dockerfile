@@ -2,7 +2,8 @@ FROM ubuntu:20.04
 ENV TZ=Europe/Minsk
 ENV DEBIAN_FRONTEND=noninteractive
 
-COPY ./wg_dashboard_frontend /tmp/build
+#COPY ./wg-manager /tmp/build
+RUN mkdir -p /tmp/build
 WORKDIR /tmp/build
 
 RUN apt-get update && apt-get install -y \
@@ -25,7 +26,7 @@ WORKDIR /app
 ENV LIBRARY_PATH=/lib:/usr/lib
 ENV TZ=Europe/Oslo
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-COPY wg_dashboard_backend /app
+COPY wg-manager-backend /app
 
 # Install dependencies
 #RUN apk add --no-cache --update wireguard-tools py3-gunicorn python3 py3-pip ip6tables

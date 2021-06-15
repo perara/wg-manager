@@ -1,0 +1,21 @@
+pydantic
+fastapi
+aiofiles
+aiosqlite
+sqlalchemy < 1.4.0
+databases
+PyJWT
+passlib
+bcrypt
+python-multipart
+jinja2
+sqlalchemy_utils
+sqlalchemy-migrate
+requests
+uvicorn
+uvicorn-loguru-integration
+uvloop
+httptools
+qrcode[pil]
+alembic
+loguru

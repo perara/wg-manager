@@ -1,0 +1,206 @@
+<mat-expansion-panel>
+  <mat-expansion-panel-header>
+
+    <mat-panel-title>
+      <b>New WireGuard Server</b>
+    </mat-panel-title>
+
+
+    <mat-panel-description>
+      Expand this to open configuration of a new wireguard server
+    </mat-panel-description>
+  </mat-expansion-panel-header>
+
+
+      <form [formGroup]="serverForm" class="add-server-form">
+
+        <p><b>Network Configuration</b></p>
+
+        <table class="add-server-full-width" cellspacing="0"><tr>
+          <td>
+            <mat-form-field class="add-server-full-width">
+              <mat-label>Interface</mat-label>
+              <input formControlName="interface" matInput [placeholder]="defaultInterface">
+            </mat-form-field>
+          </td>
+
+          <td>
+            <mat-form-field class="add-server-full-width">
+              <mat-label>Endpoint</mat-label>
+              <input formControlName="endpoint" matInput [placeholder]="defaultEndpoint">
+            </mat-form-field>
+          </td>
+          <td>
+            <mat-form-field class="add-server-full-width">
+              <mat-label>Port</mat-label>
+              <input formControlName="listen_port" matInput [placeholder]="defaultListenPort">
+            </mat-form-field>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <mat-form-field class="add-server-full-width">
+              <mat-label>Default DNS</mat-label>
+              <input formControlName="dns" matInput [placeholder]="defaultIPv4Address">
+            </mat-form-field>
+          </td>
+
+          <td>
+            <mat-form-field class="add-server-full-width">
+              <mat-label>Default allowed IPs</mat-label>
+              <input formControlName="allowed_ips" matInput [placeholder]="defaultAllowedIPs">
+            </mat-form-field>
+          </td>
+
+          <td>
+            <mat-form-field class="add-server-full-width">
+              <mat-label>Default PersistentKeepalive interval</mat-label>
+              <input formControlName="keep_alive" matInput [placeholder]="defaultPersistentKeepalive">
+            </mat-form-field>
+          </td>
+        </tr>
+
+
+
+        </table>
+
+        <p><b>IPv4 Configuration</b></p>
+        <table class="add-server-full-width" cellspacing="0"><tr>
+
+          <td>
+            <mat-form-field class="add-server-full-width">
+              <mat-label>IPv4 Address</mat-label>
+              <input formControlName="address" matInput [placeholder]="defaultIPv4Address">
+            </mat-form-field>
+          </td>
+
+          <td>
+            <mat-form-field matLine class="add-server-full-width">
+              <mat-label>Subnet</mat-label>
+              <select matNativeControl formControlName="subnet">
+                <option *ngFor="let v4Subnet of v4Subnets" [value]="v4Subnet">/{{v4Subnet}}</option>
+              </select>
+
+            </mat-form-field>
+          </td>
+
+
+        </tr></table>
+
+        <p><b>IPv6 Configuration</b></p>
+        <table class="add-server-full-width" cellspacing="0"><tr>
+          <td>
+            <mat-checkbox [checked]="defaultHasIPV6Support" [value]="defaultHasIPV6Support" (change)="ipv6SupportChanged($event)">IPv6 Support</mat-checkbox>
+          </td>
+
+
+        </tr></table>
+
+        <table class="add-server-full-width" cellspacing="0"><tr>
+
+          <td>
+            <mat-form-field class="add-server-full-width">
+              <mat-label>IPv6 Address</mat-label>
+              <input formControlName="v6_address" matInput [placeholder]="defaultIPv6Address">
+            </mat-form-field>
+          </td>
+
+          <td>
+            <mat-form-field matLine class="add-server-full-width">
+              <mat-label>Subnet</mat-label>
+              <select matNativeControl formControlName="v6_subnet">
+                <option *ngFor="let v6Subnet of v6Subnets" [value]="v6Subnet">/{{v6Subnet}}</option>
+              </select>
+
+            </mat-form-field>
+          </td>
+
+        </tr></table>
+
+
+        <p><b>Key-pairs</b></p>
+
+        <div class="button-row">
+          <button type="button" [disabled]="!isEdit" (click)="getKeyPair()" mat-raised-button color="primary">
+            <i class="material-icons">vpn_key</i>
+            Generate KeyPair
+          </button>
+        </div>
+
+        <table class="add-server-full-width" cellspacing="0">
+          <tr>
+            <td>
+              <mat-form-field class="add-server-full-width">
+                <mat-label>Private-Key</mat-label>
+                <input formControlName="private_key" matInput>
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <mat-form-field class="add-server-full-width">
+                <mat-label>Public-Key</mat-label>
+                <input formControlName="public_key" matInput>
+              </mat-form-field>
+            </td>
+          </tr>
+        </table>
+
+        <p><b>Scripts</b></p>
+        <table class="add-server-full-width" cellspacing="0">
+          <tr>
+            <td>
+              <mat-form-field class="add-server-full-width">
+                <mat-label>Post-Up</mat-label>
+                <textarea formControlName="post_up" matInput rows="4"></textarea>
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <mat-form-field class="add-server-full-width">
+                <mat-label>Post-Down</mat-label>
+                <textarea formControlName="post_down" matInput rows="4"></textarea>
+              </mat-form-field>
+            </td>
+          </tr>
+        </table>
+
+        <div class="button-row">
+
+          <button mat-raised-button color="primary"
+                  type="submit"
+                  [disabled]="!serverForm.valid"
+                  (click)="serverForm.valid && add(serverForm.value)"
+                  (keydown.enter)="serverForm.valid && add(serverForm.value)"
+          >
+            <ng-container *ngIf="!isEdit">Add Server</ng-container>
+            <ng-container *ngIf="isEdit">Edit Server</ng-container>
+          </button>
+
+          <button mat-raised-button color="warn" (click)="resetForm()">
+            Reset
+          </button>
+
+          <input #confInput hidden="true" type="file" multiple onclick="this.value=null" (change)="parseFiles($event)" accept=".conf"/>
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="confInput.click()"
+            matTooltip="Import existing wireguard configuration. You can select both server and peer configuration. The number of imported peers are described near the submit button."
+          >Import Configuration</button>
+
+          <div *ngIf="this.serverForm.value['peers'] && this.serverForm.value['peers'].length > 0">
+            Importing <b>{{this.serverForm.value['peers'].length}}</b> peers.
+          </div>
+
+        </div>
+
+      </form>
+
+
+
+
+
+</mat-expansion-panel>
+
