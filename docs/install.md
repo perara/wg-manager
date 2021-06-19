@@ -40,8 +40,7 @@ apt-get install -y nodejs
 ### WireGuard: Ubuntu
 #### 18.04 and later
 ```
-sudo apt update
-sudo apt install wireguard wireguard-tools -y
+sudo apt update && sudo apt install wireguard wireguard-tools -y
 ```
 #### 16.04 and earlier
 ```
