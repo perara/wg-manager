@@ -74,21 +74,21 @@ sudo apt install wireguard wireguard-tools -y
 ## 3. Building front-end
 ```
 # Building frontend
-sudo git clone https://github.com/perara/wg-manager.git /opt/wg-manager
+git clone https://github.com/perara/wg-manager.git /opt/wg-manager
 cd /opt/wg-manager/wg-manager-frontend
-sudo npm install --unsafe-perm > /dev/null && sudo npm install @angular/cli > /dev/null
-sudo node_modules/@angular/cli/bin/ng build --configuration="production"
+npm install --unsafe-perm > /dev/null && npm install @angular/cli > /dev/null
+node_modules/@angular/cli/bin/ng build --configuration="production"
 ```
 One thing to be aware of is that when issuing the `sudo node_modules/@angular/cli/bin/ng build --configuration="production"` command, if you do not have enough memory on your server, the process will get "Killed". This is likely to happen when trying to compile on the lowest machines with less than 1.5GB of memory. To get around this you can either add more memory or create a swap file. Here is a great guide on [creating a swap file](https://linuxize.com/post/create-a-linux-swap-file/).
 
 ## 4. Setup back-end
 ```
-sudo mv dist ../wg-manager-backend/build
+mv dist ../wg-manager-backend/build
 cd ../wg-manager-backend/
-sudo python3 -m venv venv && source venv/bin/activate
-sudo pip3 install -r requirements.txt
-sudo pip3 install uvicorn
-sudo uvicorn main:app --host=0.0.0.0
+python3 -m venv venv && source venv/bin/activate
+pip3 install -r requirements.txt
+pip3 install uvicorn
+uvicorn main:app --host=0.0.0.0
 ```
 
 ## 5. Complete
