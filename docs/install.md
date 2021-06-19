@@ -79,7 +79,7 @@ cd /opt/wg-manager/wg-manager-frontend
 sudo npm install --unsafe-perm > /dev/null && sudo npm install @angular/cli > /dev/null
 sudo node_modules/@angular/cli/bin/ng build --configuration="production"
 ```
-One thing to be aware of is that when issuing the `sudo node_modules/@angular/cli/bin/ng build --configuration="production"` command, if you do not have enough memory on your server, the process will get "Killed". This happens when trying to compile on the lowest tier DIgital Ocean droplet. To get around this you can either add more memory or create a swap file. Here is a great guide on [creating a swap file](https://linuxize.com/post/create-a-linux-swap-file/).
+One thing to be aware of is that when issuing the `sudo node_modules/@angular/cli/bin/ng build --configuration="production"` command, if you do not have enough memory on your server, the process will get "Killed". This is likely to happen when trying to compile on the lowest machines with less than 1.5GB of memory. To get around this you can either add more memory or create a swap file. Here is a great guide on [creating a swap file](https://linuxize.com/post/create-a-linux-swap-file/).
 
 ## 4. Setup back-end
 ```
