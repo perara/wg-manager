@@ -26,18 +26,17 @@ Refer to the list in the main readme file.
 sudo apt-get update && sudo apt-get install git python3 python3-pip python3-venv -y
 ```
 
-### Node.JS: Ubuntu
+### Node.JS
 ```
-curl -sL https://deb.nodesource.com/setup_13.x | sudo bash -
+# Using Ubuntu
+curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
 sudo apt-get install -y nodejs
+
+# Using Debian, as root
+curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
+apt-get install -y nodejs
 ```
 
-### Node.JS: Debian
-```
-sudo apt install curl
-curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
-sudo apt-get install -y nodejs
-```
 ### WireGuard: Ubuntu
 #### 18.04 and later
 ```
