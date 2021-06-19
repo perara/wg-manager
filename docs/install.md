@@ -74,8 +74,8 @@ sudo apt install wireguard wireguard-tools -y
 ## 3. Building front-end
 ```
 # Building frontend
-git clone https://github.com/perara/wg-manager.git /opt/wg-manager
-cd /opt/wg-manager/wg-manager-frontend
+git clone https://github.com/perara/wg-manager.git
+cd wg-manager/wg-manager-frontend
 npm install --unsafe-perm > /dev/null && npm install @angular/cli > /dev/null
 node_modules/@angular/cli/bin/ng build --configuration="production"
 ```
