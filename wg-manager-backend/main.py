@@ -67,17 +67,7 @@ def root():
 app.mount("/", StaticFiles(directory=pkg_resources.resource_filename(__name__, 'build')), name="static")
 
 
-@app.on_event("startup")
-async def startup():
-    pass
-
-
-@app.on_event("shutdown")
-async def shutdown():
-    pass
-
-
-if __name__ == "__main__":
+def main():
     # Sleep the wait timer.
     time.sleep(const.INIT_SLEEP)
 
@@ -89,6 +79,22 @@ if __name__ == "__main__":
 
     # Configure wireguard
     script.wireguard_startup.setup_on_start()
+
+
+@app.on_event("startup")
+async def startup():
+    if __name__ != "__main__":
+        main()
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    pass
+
+
+if __name__ == "__main__":
+
+    main()
 
     run_uvicorn_loguru(
         uvicorn.Config(

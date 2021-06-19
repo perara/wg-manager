@@ -1,4 +1,3 @@
-import contextlib
 import os
 
 import alembic.command
@@ -27,6 +26,7 @@ def perform_migrations():
 def setup_initial_database():
     if not database_exists(engine.url):
         logger.info("Database does not exists. Creating initial database...")
+
         # Create database from metadata
         Base.metadata.create_all(engine)
         logger.info("Database creation done!")
@@ -34,25 +34,23 @@ def setup_initial_database():
     # Create default user
     _db: Session = SessionLocal()
 
-    admin_exists = (
-                       _db.query(models.User.id)
-                           .filter_by(role="admin")
-                           .first()
-                   ) is not None
+    # Retrieve user with admin role
+    admin_exists = _db.query(models.User.id).filter_by(role="admin").first() is not None
 
     if not admin_exists:
         logger.info("Admin user does not exists. Creating with env variables ADMIN_USERNAME, ADMIN_PASSWORD")
-        ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
-        ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
+        env_admin_username = os.getenv("ADMIN_USERNAME")
+        env_admin_password = os.getenv("ADMIN_PASSWORD")
 
-        if not ADMIN_USERNAME:
+        if not env_admin_username:
             raise RuntimeError("Database does not exist and the environment variable ADMIN_USERNAME is set")
-        if not ADMIN_PASSWORD:
+
+        if not env_admin_password:
             raise RuntimeError("Database does not exist and the environment variable ADMIN_PASSWORD is set")
 
         _db.merge(models.User(
-            username=ADMIN_USERNAME,
-            password=middleware.get_password_hash(ADMIN_PASSWORD),
+            username=env_admin_username,
+            password=middleware.get_password_hash(env_admin_password),
             full_name="Admin",
             role="admin",
             email=""
