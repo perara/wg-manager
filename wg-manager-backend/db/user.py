@@ -33,7 +33,9 @@ def get_user_by_username_and_password(db: Session, username: str, password: str)
 
 
 def create_user(sess: Session, user: models.User):
-    user.password = get_password_hash(user.password)
+    # Only hash password if set. Use case: LDAP users don't have passwords on database
+    if user.password:
+        user.password = get_password_hash(user.password)
     sess.add(user)
     sess.commit()
 

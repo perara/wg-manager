@@ -78,15 +78,8 @@ def get_api_keys(
 
 @router.post("/login", response_model=schemas.Token)
 def login(*, username: str = Form(...), password: str = Form(...), sess: Session = Depends(middleware.get_db)):
-    user: schemas.UserInDB = schemas.UserInDB(username=username, password="").from_db(sess)
-
-    # Verify password
-    if not user or not middleware.verify_password(password, user.password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    auth: middleware.Authentication = middleware.Authentication(username, password, sess)
+    user: schemas.UserInDB = auth.login()
 
     # Create token
     access_token_expires = timedelta(minutes=const.ACCESS_TOKEN_EXPIRE_MINUTES)
