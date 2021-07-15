@@ -2,6 +2,7 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 from database import models
+from middleware import get_password_hash
 
 import schemas
 
