@@ -19,3 +19,4 @@ httptools
 qrcode[pil]
 alembic
 loguru
+ldap3==2.9

@@ -35,6 +35,36 @@ SERVER = os.getenv("SERVER", "1") == "1"
 CLIENT = os.getenv("CLIENT", "0") == "1"
 CLIENT_START_AUTOMATICALLY = os.getenv("CLIENT_START_AUTOMATICALLY", "1") == "1"
 
+AUTH_LOCAL_ENABLED = os.getenv("AUTH_LOCAL_ENABLED", "1") == "1"
+AUTH_LDAP_ENABLED = os.getenv("AUTH_LDAP_ENABLED", "0") == "1"
+AUTH_LDAP_SERVER = os.getenv("AUTH_LDAP_SERVER", None)
+AUTH_LDAP_PORT = os.getenv("AUTH_LDAP_PORT", None)
+AUTH_LDAP_USER = os.getenv("AUTH_LDAP_USER", None)
+AUTH_LDAP_PASSWORD = os.getenv("AUTH_LDAP_PASSWORD", None)
+AUTH_LDAP_BASE = os.getenv("AUTH_LDAP_BASE", None)
+AUTH_LDAP_FILTER = os.getenv("AUTH_LDAP_FILTER", None)
+AUTH_LDAP_ACTIVEDIRECTORY = os.getenv("AUTH_LDAP_ACTIVEDIRECTORY", "0") == "1"
+AUTH_LDAP_DOMAIN = os.getenv("AUTH_LDAP_DOMAIN", None)
+AUTH_LDAP_SECURITY = os.getenv("AUTH_LDAP_SECURITY", None)
+AUTH_LDAP_SECURITY_VALID_CERTIFICATE = os.getenv("AUTH_LDAP_SECURITY_VALID_CERTIFICATE", "1") == "1"
+
+assert AUTH_LOCAL_ENABLED or AUTH_LDAP_ENABLED, "At least one authentication engine must be enabled"
+
+if AUTH_LDAP_ENABLED:
+    assert AUTH_LDAP_SERVER, "AUTH_LDAP_SERVER is required"
+    assert AUTH_LDAP_SECURITY in (None, "SSL", "TLS"), "Invalid value for AUTH_LDAP_SECURITY. Valid values are SSL and TLS"
+    assert AUTH_LDAP_BASE, "AUTH_LDAP_BASE is required"
+    assert AUTH_LDAP_FILTER, "AUTH_LDAP_FILTER is required"
+    if AUTH_LDAP_ACTIVEDIRECTORY:
+        assert AUTH_LDAP_DOMAIN, "AUTH_LDAP_DOMAIN is required when using Active Directory"
+    if not AUTH_LDAP_PORT:
+        if AUTH_LDAP_SECURITY == "SSL":
+            AUTH_LDAP_PORT = 636
+        else:
+            AUTH_LDAP_PORT = 389
+    else:
+        AUTH_LDAP_PORT = int(AUTH_LDAP_PORT)
+
 if not IS_DOCKER:
     CMD_WG_COMMAND = ["sudo"] + CMD_WG_COMMAND
     CMD_WG_QUICK = ["sudo"] + CMD_WG_QUICK
