@@ -79,6 +79,9 @@ or [build docker image from github](./docs/install_docker_github.md)
 ## Method #2: Bare Metal
 - [Installation on Debian/Ubuntu/RPI4](./docs/install.md)
 
+# Authentication methods
+Currently, local authentication (probably unsafe) and LDAP (probably safer) are supported. Still, I do recommend you strongly to keep your dashboard unavailable for public audiences. [Look here for setting up LDAP](https://github.com/perara/wg-manager/pull/110#issuecomment-881947808): 
+
 # Using the development branch
 As there is no builds for the development branch, you have to do the following:
 Change `image: perara/wg-manager` to
