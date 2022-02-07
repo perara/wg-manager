@@ -19,11 +19,10 @@ services:
       PORT: 8888
       ADMIN_USERNAME: admin
       ADMIN_PASSWORD: admin
-      WEB_CONCURRENCY: 2
+      WEB_CONCURRENCY: 1
       SERVER_INIT_INTERFACE_START: 1
-
       #endpoint dynamic variables: ||external|| , ||internal||
-      SERVER_INIT_INTERFACE: '{"address":"10.0.200.1","v6_address":"fd42:42:42::1","subnet":24,"v6_subnet":64,"interface":"wg0","listen_port":"51820","endpoint":"server","dns":"10.0.200.1,8.8.8.8","private_key":"","public_key":"","post_up":"","post_down":"","configuration":"","is_running":false,"peers":[]}'
+      SERVER_INIT_INTERFACE: '{"address":"10.0.200.1","v6_support":"true", "v6_address":"fd42:42:42::1","subnet":24,"v6_subnet":64,"interface":"wg0","listen_port":"51820","endpoint":"server","dns":"10.0.200.1,8.8.8.8","private_key":"","public_key":"","post_up":"","post_down":"","configuration":"","is_running":false,"peers":[]}'
       SERVER_STARTUP_API_KEY: thisisasecretkeythatnobodyknows
     networks:
       - wg-manager-net
