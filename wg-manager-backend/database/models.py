@@ -35,7 +35,7 @@ class WGServer(Base):
     subnet = Column(sqlalchemy.Integer, nullable=False)
     address = Column(sqlalchemy.String, unique=True)
     v6_address = Column(sqlalchemy.String, unique=True)
-    v6_subnet = Column(sqlalchemy.Integer, nullable=False)
+    v6_subnet = Column(sqlalchemy.Integer)
     listen_port = Column(sqlalchemy.String, unique=True)
     private_key = Column(sqlalchemy.String)
     public_key = Column(sqlalchemy.String)
