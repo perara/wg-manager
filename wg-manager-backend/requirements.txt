@@ -20,3 +20,4 @@ qrcode[pil]
 alembic
 loguru
 ldap3==2.9
+pywireguard==0.1.3
